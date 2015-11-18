@@ -1,6 +1,6 @@
 # electron-dl [![Build Status](https://travis-ci.org/sindresorhus/electron-dl.svg?branch=master)](https://travis-ci.org/sindresorhus/electron-dl)
 
-> Simplified file downloads for you app
+> Simplified file downloads for your [Electron](http://electron.atom.io) app
 
 
 ## Why?
