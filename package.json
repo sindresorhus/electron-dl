@@ -1,0 +1,38 @@
+{
+  "name": "electron-dl",
+  "version": "0.0.0",
+  "description": "Simplified file downloads for you app",
+  "license": "MIT",
+  "repository": "sindresorhus/electron-dl",
+  "author": {
+    "name": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com"
+  },
+  "scripts": {
+    "start": "electron test.js",
+    "test": "xo"
+  },
+  "files": [
+    "index.js"
+  ],
+  "keywords": [
+    "electron",
+    "app",
+    "file",
+    "download",
+    "downloader",
+    "progress"
+  ],
+  "devDependencies": {
+    "electron-prebuilt": "^0.35.0",
+    "xo": "*"
+  },
+  "xo": {
+    "esnext": true,
+    "envs": [
+      "node",
+      "browser"
+    ]
+  }
+}
