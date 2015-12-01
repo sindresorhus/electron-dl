@@ -25,7 +25,7 @@
     "progress"
   ],
   "devDependencies": {
-    "electron-prebuilt": "^0.35.0",
+    "electron-prebuilt": "^0.35.2",
     "xo": "*"
   },
   "xo": {
