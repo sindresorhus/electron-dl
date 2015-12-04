@@ -14,16 +14,8 @@ module.exports = () => {
 				win.setProgressBar(item.getReceivedBytes() / totalBytes);
 			});
 
-			let winOpen = true;
-
-			// workaround for:
-			// https://github.com/atom/electron/issues/3488
-			win.on('close', () => {
-				winOpen = false;
-			});
-
 			item.on('done', (e, state) => {
-				if (winOpen) {
+				if (!win.isDestroyed()) {
 					win.setProgressBar(-1);
 				}
 
