@@ -29,11 +29,11 @@ require('electron-dl')();
 let win;
 
 app.on('ready', () => {
-	win = new BrowserWindow({});
+	win = new BrowserWindow();
 });
 ```
 
 
 ## License
 
-MIT © [Sindre Sorhus](http://sindresorhus.com)
+MIT © [Sindre Sorhus](https://sindresorhus.com)
