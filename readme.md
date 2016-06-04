@@ -22,6 +22,10 @@ $ npm install --save electron-dl
 
 ## Usage
 
+### Register it for all windows
+
+This is probably what you want for your app.
+
 ```js
 const {app, BrowserWindow} = require('electron');
 
@@ -31,6 +35,19 @@ let win;
 
 app.on('ready', () => {
 	win = new BrowserWindow();
+});
+```
+
+### Use it manually
+
+This can be useful if you need download functionality in a reusable module.
+
+```js
+const {app, BrowserWindow, ipcMain} = require('electron');
+const {download} = require('electron-dl');
+
+ipcMain.on('download-btn', (e, args) => {
+	download(BrowserWindow.getFocusedWindow(), args.url);
 });
 ```
 
