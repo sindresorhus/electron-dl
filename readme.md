@@ -52,6 +52,13 @@ ipcMain.on('download-btn', (e, args) => {
 ```
 
 
+## Related
+
+- [electron-debug](https://github.com/sindresorhus/electron-debug) - Adds useful debug features to your Electron app
+- [electron-context-menu](https://github.com/sindresorhus/electron-context-menu) - Context menu for your Electron app
+- [electron-config](https://github.com/sindresorhus/electron-config) - Simple config handling for your Electron app or module
+
+
 ## License
 
 MIT © [Sindre Sorhus](https://sindresorhus.com)
