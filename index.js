@@ -8,7 +8,9 @@ function registerListener(win, opts = {}) {
 		const totalBytes = item.getTotalBytes();
 		const filePath = path.join(app.getPath('downloads'), item.getFilename());
 
-		item.setSavePath(filePath);
+		if (!opts.saveAs) {
+			item.setSavePath(filePath);
+		}
 
 		// TODO: use mime type checking for file extension when no extension can be inferred
 		// item.getMimeType()
@@ -47,7 +49,8 @@ module.exports = () => {
 	});
 };
 
-module.exports.download = (win, url) => {
-	registerListener(win, {unregisterWhenDone: true});
+module.exports.download = (win, url, opts = {}) => {
+	opts.unregisterWhenDone = true;
+	registerListener(win, opts);
 	win.webContents.downloadURL(url);
 };
