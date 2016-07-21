@@ -51,6 +51,31 @@ ipcMain.on('download-btn', (e, args) => {
 });
 ```
 
+## API
+
+### download(window, url, [options])
+
+### window
+
+Type: `BrowserWindow`
+
+Window to register the behavior on.
+
+### url
+
+Type: `string`
+
+URL to download.
+
+### options
+
+#### saveAs
+
+Type: `boolean`<br>
+Default: `false`
+
+Show a `Save As…` dialog instead of downloading immediately.
+
 
 ## Related
 
