@@ -33,6 +33,9 @@
     "envs": [
       "node",
       "browser"
-    ]
+    ],
+    "rules": {
+      "import/no-extraneous-dependencies": "off"
+    }
   }
 }
