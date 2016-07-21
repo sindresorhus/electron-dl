@@ -50,7 +50,7 @@ module.exports = () => {
 };
 
 module.exports.download = (win, url, opts = {}) => {
-	opts.unregisterWhenDone = true;
+	opts = Object.assign({}, opts, {unregisterWhenDone: true});
 	registerListener(win, opts);
 	win.webContents.downloadURL(url);
 };

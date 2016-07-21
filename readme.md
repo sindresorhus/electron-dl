@@ -59,25 +59,23 @@ ipcMain.on('download-btn', (e, args) => {
 
 Type: `BrowserWindow`
 
-Window to register the behaviour on
+Window to register the behaviour on.
 
 ### url
 
-Type: `String`
+Type: `string`
 
-The URL to download
+URL to download.
 
 ### options
 
 #### saveAs
 
-Type: `Boolean`
+Type: `boolean`
 
 Default: `false`
 
 Show a "Save As…" dialog instead of downloading immediately.
-
-Useful if you're concerned about overriding existing files. See [issue #3](https://github.com/sindresorhus/electron-dl/issues/3)
 
 ## Related
 
