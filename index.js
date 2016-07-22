@@ -1,13 +1,14 @@
 'use strict';
 const path = require('path');
 const electron = require('electron');
+const unusedFilename = require('unused-filename');
 
 const app = electron.app;
 
 function registerListener(win, opts = {}) {
 	const listener = (e, item, webContents) => {
 		const totalBytes = item.getTotalBytes();
-		const filePath = path.join(app.getPath('downloads'), item.getFilename());
+		const filePath = unusedFilename.sync(path.join(app.getPath('downloads'), item.getFilename()));
 
 		if (!opts.saveAs) {
 			item.setSavePath(filePath);
