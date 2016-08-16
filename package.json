@@ -28,7 +28,7 @@
     "unused-filename": "^0.1.0"
   },
   "devDependencies": {
-    "electron-prebuilt": "^1.0.2",
+    "electron": "^1.3.3",
     "xo": "*"
   },
   "xo": {
