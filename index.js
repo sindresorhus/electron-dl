@@ -27,9 +27,10 @@ function registerListener(win, opts = {}, cb) {
 			}
 
 			if (state === 'interrupted') {
-				electron.dialog.showErrorBox('Download error', `The download of ${item.getFilename()} was interrupted`);
+				const message = `The download of ${item.getFilename()} was interrupted`;
+				electron.dialog.showErrorBox('Download error', message);
 				if (cb) {
-					cb(new Error(`The download of ${item.getFilename()} was interrupted`));
+					cb(new Error(message));
 				}
 			}
 
