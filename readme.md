@@ -49,7 +49,7 @@ const {download} = require('electron-dl');
 ipcMain.on('download-btn', (e, args) => {
 	download(BrowserWindow.getFocusedWindow(), args.url)
 		.then(dl => console.log(dl.getSavePath()))
-		.catch(err => console.error(err));
+		.catch(console.error);
 });
 ```
 
