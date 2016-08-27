@@ -5,7 +5,7 @@ const unusedFilename = require('unused-filename');
 
 const app = electron.app;
 
-function registerListener(win, opts = {}) {
+function registerListener(win, opts = {}, cb) {
 	const listener = (e, item, webContents) => {
 		const totalBytes = item.getTotalBytes();
 		const filePath = unusedFilename.sync(path.join(app.getPath('downloads'), item.getFilename()));
@@ -27,7 +27,11 @@ function registerListener(win, opts = {}) {
 			}
 
 			if (state === 'interrupted') {
-				electron.dialog.showErrorBox('Download error', `The download of ${item.getFilename()} was interrupted`);
+				const message = `The download of ${item.getFilename()} was interrupted`;
+				electron.dialog.showErrorBox('Download error', message);
+				if (cb) {
+					cb(new Error(message));
+				}
 			}
 
 			if (state === 'completed') {
@@ -37,6 +41,9 @@ function registerListener(win, opts = {}) {
 
 				if (opts.unregisterWhenDone) {
 					webContents.session.removeListener('will-download', listener);
+				}
+				if (cb) {
+					cb(null, item);
 				}
 			}
 		});
@@ -51,8 +58,8 @@ module.exports = () => {
 	});
 };
 
-module.exports.download = (win, url, opts) => {
+module.exports.download = (win, url, opts) => new Promise((resolve, reject) => {
 	opts = Object.assign({}, opts, {unregisterWhenDone: true});
-	registerListener(win, opts);
+	registerListener(win, opts, (err, item) => err ? reject(err) : resolve(item));
 	win.webContents.downloadURL(url);
-};
+});

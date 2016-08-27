@@ -47,13 +47,15 @@ const {app, BrowserWindow, ipcMain} = require('electron');
 const {download} = require('electron-dl');
 
 ipcMain.on('download-btn', (e, args) => {
-	download(BrowserWindow.getFocusedWindow(), args.url);
+	download(BrowserWindow.getFocusedWindow(), args.url)
+		.then(dl => console.log(dl.getSavePath()))
+		.catch(console.error);
 });
 ```
 
 ## API
 
-### download(window, url, [options])
+### download(window, url, [options]): Promise<[DownloadItem](https://github.com/electron/electron/blob/master/docs/api/download-item.md)>
 
 ### window
 
