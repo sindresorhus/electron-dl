@@ -5,7 +5,7 @@ const unusedFilename = require('unused-filename');
 
 const app = electron.app;
 
-function registerListener(win, opts = {}, cb) {
+function registerListener(win, opts = {}, cb = () => {}) {
 	const listener = (e, item, webContents) => {
 		const totalBytes = item.getTotalBytes();
 		const filePath = unusedFilename.sync(path.join(app.getPath('downloads'), item.getFilename()));
@@ -29,12 +29,8 @@ function registerListener(win, opts = {}, cb) {
 			if (state === 'interrupted') {
 				const message = `The download of ${item.getFilename()} was interrupted`;
 				electron.dialog.showErrorBox('Download error', message);
-				if (cb) {
-					cb(new Error(message));
-				}
-			}
-
-			if (state === 'completed') {
+				cb(new Error(message));
+			} else if (state === 'completed') {
 				if (process.platform === 'darwin') {
 					app.dock.downloadFinished(filePath);
 				}
@@ -42,9 +38,8 @@ function registerListener(win, opts = {}, cb) {
 				if (opts.unregisterWhenDone) {
 					webContents.session.removeListener('will-download', listener);
 				}
-				if (cb) {
-					cb(null, item);
-				}
+
+				cb(null, item);
 			}
 		});
 	};
