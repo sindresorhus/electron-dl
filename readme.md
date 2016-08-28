@@ -55,7 +55,9 @@ ipcMain.on('download-btn', (e, args) => {
 
 ## API
 
-### download(window, url, [options]): Promise<[DownloadItem](https://github.com/electron/electron/blob/master/docs/api/download-item.md)>
+### electronDl([options])
+
+### electronDl.download(window, url, [options]): Promise<[DownloadItem](https://github.com/electron/electron/blob/master/docs/api/download-item.md)>
 
 ### window
 

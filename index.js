@@ -48,9 +48,9 @@ function registerListener(win, opts = {}, cb = () => {}) {
 	win.webContents.session.on('will-download', listener);
 }
 
-module.exports = () => {
+module.exports = (opts = {}) => {
 	app.on('browser-window-created', (e, win) => {
-		registerListener(win);
+		registerListener(win, opts);
 	});
 };
 
