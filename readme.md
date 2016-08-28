@@ -78,6 +78,12 @@ Default: `false`
 
 Show a `Save As…` dialog instead of downloading immediately.
 
+#### customDir
+
+Type : `String`<br>
+Default: `null`
+
+Saves Files to custom directory instead of Downloads directory.
 
 ## Related
 
