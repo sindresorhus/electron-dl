@@ -8,7 +8,8 @@ const app = electron.app;
 function registerListener(win, opts = {}, cb = () => {}) {
 	const listener = (e, item, webContents) => {
 		const totalBytes = item.getTotalBytes();
-		const filePath = unusedFilename.sync(path.join(app.getPath('downloads'), item.getFilename()));
+		const dir = opts.directory || app.getPath('downloads');
+		const filePath = unusedFilename.sync(path.join(dir, item.getFilename()));
 
 		if (!opts.saveAs) {
 			item.setSavePath(filePath);

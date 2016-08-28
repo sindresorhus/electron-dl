@@ -78,6 +78,13 @@ Default: `false`
 
 Show a `Save As…` dialog instead of downloading immediately.
 
+#### directory
+
+Type: `string`<br>
+Default: [User's downloads directory](http://electron.atom.io/docs/api/app/#appgetpathname)
+
+Directory to save the file in.
+
 
 ## Related
 
