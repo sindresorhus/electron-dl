@@ -10,6 +10,8 @@ function registerListener(win, opts = {}, cb = () => {}) {
 		const totalBytes = item.getTotalBytes();
 		const dir = opts.directory || app.getPath('downloads');
 		const filePath = unusedFilename.sync(path.join(dir, item.getFilename()));
+		const errorMessage = 'The download of FILENAME was interrupted' || opts.errorMessage;
+		const errorTitle = 'Download Error' || opts.errorTitle;
 
 		if (!opts.saveAs) {
 			item.setSavePath(filePath);
@@ -19,7 +21,11 @@ function registerListener(win, opts = {}, cb = () => {}) {
 		// item.getMimeType()
 
 		item.on('updated', () => {
-			win.setProgressBar(item.getReceivedBytes() / totalBytes);
+			let ratio = item.getReceivedBytes() / totalBytes
+			win.setProgressBar(ratio);
+			if(opts.onProgress && typeof opts.onProgress === "function"){
+				opts.onProgress(ratio)
+			}
 		});
 
 		item.on('done', (e, state) => {
@@ -28,10 +34,14 @@ function registerListener(win, opts = {}, cb = () => {}) {
 			}
 
 			if (state === 'interrupted') {
-				const message = `The download of ${item.getFilename()} was interrupted`;
-				electron.dialog.showErrorBox('Download error', message);
+				electron.dialog.showErrorBox(errorTitle, errorMessage.replace('FILENAME',item.getFilename()));
 				cb(new Error(message));
 			} else if (state === 'completed') {
+
+				if(opts.onComplete && typeof opts.onComplete === "function"){
+					opts.onComplete(filePath)
+				}
+
 				if (process.platform === 'darwin') {
 					app.dock.downloadFinished(filePath);
 				}

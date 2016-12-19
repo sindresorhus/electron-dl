@@ -89,6 +89,34 @@ Default: [User's downloads directory](http://electron.atom.io/docs/api/app/#appg
 
 Directory to save the file in.
 
+#### errorTitle
+
+Type: `string`<br>
+Default: `Download Error`
+
+The title of the error dialog. Can be customised for localization.
+
+#### errorMessage
+
+Type: `string`<br>
+Default: `The download of FILENAME was interrupted`
+
+The message of the error dialog. `FILENAME` is replaced with the name of the actual file. Can be customised for localization.
+
+#### onProgress
+
+Type: `function`<br>
+Default: `undefined`
+
+An optional callback to receive a ratio between `0` and `1` with the state of the current download.
+
+#### onComplete
+
+Type: `function`<br>
+Default: `undefined`
+
+An optional callback that will be called when the download finishes. It returns the complete path of the downloaded file.
+
 
 ## Related
 
