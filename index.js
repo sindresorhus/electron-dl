@@ -21,7 +21,7 @@ function registerListener(win, opts = {}, cb = () => {}) {
 		// item.getMimeType()
 
 		item.on('updated', () => {
-			let ratio = item.getReceivedBytes() / totalBytes
+			const ratio = item.getReceivedBytes() / totalBytes
 			win.setProgressBar(ratio);
 			if(opts.onProgress && typeof opts.onProgress === "function"){
 				opts.onProgress(ratio)
@@ -34,7 +34,8 @@ function registerListener(win, opts = {}, cb = () => {}) {
 			}
 
 			if (state === 'interrupted') {
-				electron.dialog.showErrorBox(errorTitle, errorMessage.replace('FILENAME',item.getFilename()));
+				const message = errorMessage.replace('FILENAME',item.getFilename())
+				electron.dialog.showErrorBox(errorTitle, message);
 				cb(new Error(message));
 			} else if (state === 'completed') {
 
