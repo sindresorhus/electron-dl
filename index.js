@@ -36,6 +36,7 @@ function registerListener(win, opts = {}, cb = () => {}) {
 				if (process.platform === 'darwin') {
 					app.dock.downloadFinished(filePath);
 				} else {
+					// After successful download, open the containing folder
 					shell.showItemInFolder(filePath);
 				}
 
