@@ -4,6 +4,7 @@ const electron = require('electron');
 const unusedFilename = require('unused-filename');
 
 const app = electron.app;
+const shell = electron.shell;
 
 function registerListener(win, opts = {}, cb = () => {}) {
 	const listener = (e, item, webContents) => {
@@ -34,6 +35,8 @@ function registerListener(win, opts = {}, cb = () => {}) {
 			} else if (state === 'completed') {
 				if (process.platform === 'darwin') {
 					app.dock.downloadFinished(filePath);
+				} else {
+					shell.showItemInFolder(filePath);
 				}
 
 				if (opts.unregisterWhenDone) {
