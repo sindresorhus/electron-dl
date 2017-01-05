@@ -21,9 +21,9 @@ function registerListener(win, opts = {}, cb = () => {}) {
 		// item.getMimeType()
 
 		item.on('updated', () => {
-			const ratio = item.getReceivedBytes() / totalBytes
+			const ratio = item.getReceivedBytes() / totalBytes;
 			win.setProgressBar(ratio);
-			if(opts.onProgress && typeof opts.onProgress === "function"){
+			if (opts.onProgress && typeof opts.onProgress === 'function') {
 				opts.onProgress(ratio)
 			}
 		});
@@ -34,13 +34,12 @@ function registerListener(win, opts = {}, cb = () => {}) {
 			}
 
 			if (state === 'interrupted') {
-				const message = errorMessage.replace('FILENAME',item.getFilename())
+				const message = errorMessage.replace('FILENAME', item.getFilename());
 				electron.dialog.showErrorBox(errorTitle, message);
 				cb(new Error(message));
 			} else if (state === 'completed') {
-
-				if(opts.onComplete && typeof opts.onComplete === "function"){
-					opts.onComplete(filePath)
+				if (opts.onComplete && typeof opts.onComplete === 'function') {
+					opts.onComplete(filePath);
 				}
 
 				if (process.platform === 'darwin') {
