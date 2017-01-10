@@ -35,7 +35,7 @@ function registerListener(win, opts = {}, cb = () => {}) {
 			}
 
 			if (state === 'interrupted') {
-				const message = pupa(errorMessage,{filename:item.getFilename()});
+				const message = pupa(errorMessage, {filename: item.getFilename()});
 				electron.dialog.showErrorBox(errorTitle, message);
 				cb(new Error(message));
 			} else if (state === 'completed') {
