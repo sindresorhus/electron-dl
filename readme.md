@@ -99,24 +99,16 @@ The title of the error dialog. Can be customised for localization.
 #### errorMessage
 
 Type: `string`<br>
-Default: `The download of FILENAME was interrupted`
+Default: `The download of {filename} was interrupted`
 
-The message of the error dialog. `FILENAME` is replaced with the name of the actual file. Can be customised for localization.
+The message of the error dialog. `{filename}` is replaced with the name of the actual file. Can be customised for localization.
 
 #### onProgress
 
-Type: `function`<br>
+Type: `Function`<br>
 Default: `undefined`
 
 An optional callback to receive a ratio between `0` and `1` with the state of the current download.
-
-#### onComplete
-
-Type: `function`<br>
-Default: `undefined`
-
-An optional callback that will be called when the download finishes. It returns the complete path of the downloaded file.
-
 
 ## Related
 

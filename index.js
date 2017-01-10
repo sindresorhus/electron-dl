@@ -2,6 +2,7 @@
 const path = require('path');
 const electron = require('electron');
 const unusedFilename = require('unused-filename');
+const pupa = require('pupa');
 
 const app = electron.app;
 
@@ -10,7 +11,7 @@ function registerListener(win, opts = {}, cb = () => {}) {
 		const totalBytes = item.getTotalBytes();
 		const dir = opts.directory || app.getPath('downloads');
 		const filePath = unusedFilename.sync(path.join(dir, item.getFilename()));
-		const errorMessage = opts.errorMessage || 'The download of FILENAME was interrupted';
+		const errorMessage = opts.errorMessage || 'The download of {filename} was interrupted';
 		const errorTitle = opts.errorTitle || 'Download Error';
 
 		if (!opts.saveAs) {
@@ -34,14 +35,10 @@ function registerListener(win, opts = {}, cb = () => {}) {
 			}
 
 			if (state === 'interrupted') {
-				const message = errorMessage.replace('FILENAME', item.getFilename());
+				const message = pupa(errorMessage,{filename:item.getFilename()})
 				electron.dialog.showErrorBox(errorTitle, message);
 				cb(new Error(message));
 			} else if (state === 'completed') {
-				if (opts.onComplete && typeof opts.onComplete === 'function') {
-					opts.onComplete(filePath);
-				}
-
 				if (process.platform === 'darwin') {
 					app.dock.downloadFinished(filePath);
 				}
