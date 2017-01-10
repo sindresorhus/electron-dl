@@ -25,6 +25,7 @@
     "progress"
   ],
   "dependencies": {
+    "pupa": "^1.0.0",
     "unused-filename": "^0.1.0"
   },
   "devDependencies": {
