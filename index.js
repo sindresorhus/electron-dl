@@ -24,7 +24,8 @@ function registerListener(win, opts = {}, cb = () => {}) {
 		item.on('updated', () => {
 			const ratio = item.getReceivedBytes() / totalBytes;
 			win.setProgressBar(ratio);
-			if (opts.onProgress && typeof opts.onProgress === 'function') {
+			
+			if (typeof opts.onProgress === 'function') {
 				opts.onProgress(ratio);
 			}
 		});
