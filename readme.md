@@ -109,6 +109,13 @@ Type: `Function`
 
 Optional callback that receives a number between `0` and `1` representing the progress of the current download.
 
+#### openFolderWhenDone
+
+Type: `boolean`<br>
+Default: `false`
+
+Reveal the downloaded file in the system file manager, and if possible, select the file.
+
 
 ## Related
 
