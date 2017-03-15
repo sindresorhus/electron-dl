@@ -114,7 +114,7 @@ Optional callback that receives a number between `0` and `1` representing the pr
 Type: `boolean`<br>
 Default: `false`
 
-After a successful download, show the file in a file manager. If possible, select the file.
+Reveal the downloaded file in the system file manager, and if possible, select the file.
 
 
 ## Related
