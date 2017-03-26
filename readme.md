@@ -89,6 +89,13 @@ Default: [User's downloads directory](http://electron.atom.io/docs/api/app/#appg
 
 Directory to save the file in.
 
+#### filename
+
+Type: `string`<br>
+Default: [downloadItem.getFilename()](https://github.com/electron/electron/blob/master/docs/api/download-item.md#downloaditemgetfilename)
+
+Name of the saved file.
+
 #### errorTitle
 
 Type: `string`<br>
