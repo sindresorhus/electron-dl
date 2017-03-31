@@ -92,9 +92,11 @@ Directory to save the file in.
 #### filename
 
 Type: `string`<br>
-Default: [downloadItem.getFilename()](https://github.com/electron/electron/blob/master/docs/api/download-item.md#downloaditemgetfilename)
+Default: [`downloadItem.getFilename()`](https://electron.atom.io/docs/api/download-item/#downloaditemgetfilename)
 
 Name of the saved file.
+
+This option only makes sense for `electronDl.download()`
 
 #### errorTitle
 
