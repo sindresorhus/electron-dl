@@ -96,7 +96,7 @@ Default: [`downloadItem.getFilename()`](https://electron.atom.io/docs/api/downlo
 
 Name of the saved file.
 
-This option only makes sense for `electronDl.download()`
+This option only makes sense for `electronDl.download()`.
 
 #### errorTitle
 
