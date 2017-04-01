@@ -11,7 +11,12 @@ function registerListener(win, opts = {}, cb = () => {}) {
 	const listener = (e, item, webContents) => {
 		const totalBytes = item.getTotalBytes();
 		const dir = opts.directory || app.getPath('downloads');
-		const filePath = unusedFilename.sync(path.join(dir, item.getFilename()));
+		let filePath;
+		if (opts.filename) {
+			filePath = path.join(dir, opts.filename);
+		} else {
+			filePath = unusedFilename.sync(path.join(dir, item.getFilename()));
+		}
 		const errorMessage = opts.errorMessage || 'The download of {filename} was interrupted';
 		const errorTitle = opts.errorTitle || 'Download Error';
 
