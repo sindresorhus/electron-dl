@@ -88,3 +88,4 @@ module.exports.download = (win, url, opts) => new Promise((resolve, reject) => {
 	registerListener(win.webContents.session, opts, (err, item) => err ? reject(err) : resolve(item));
 	win.webContents.downloadURL(url);
 });
+
