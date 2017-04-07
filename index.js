@@ -12,7 +12,7 @@ function registerListener(session, opts = {}, cb = () => {}) {
 	const listener = (e, item, webContents) => {
 		let hostWebContents = webContents;
 		if (webContents.getType() === 'webview') {
-			const hostWebContents = webContents.hostWebContents;
+			hostWebContents = webContents.hostWebContents;
 		}
 
 		const win = BrowserWindow.fromWebContents(hostWebContents);
@@ -78,7 +78,7 @@ function registerListener(session, opts = {}, cb = () => {}) {
 }
 
 module.exports = (opts = {}) => {
-	app.on('session-created', (session) => {
+	app.on('session-created', session => {
 		registerListener(session, opts);
 	});
 };
