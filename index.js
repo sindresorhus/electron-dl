@@ -1,22 +1,31 @@
 'use strict';
 const path = require('path');
 const electron = require('electron');
+const BrowserWindow = require('electron').BrowserWindow;
 const unusedFilename = require('unused-filename');
 const pupa = require('pupa');
 
 const app = electron.app;
 const shell = electron.shell;
 
-function registerListener(win, opts = {}, cb = () => {}) {
+function registerListener(session, opts = {}, cb = () => {}) {
 	const listener = (e, item, webContents) => {
+		let hostWebContents = webContents;
+		if (webContents.getType() === 'webview') {
+			const hostWebContents = webContents.hostWebContents;
+		}
+
+		const win = BrowserWindow.fromWebContents(hostWebContents);
 		const totalBytes = item.getTotalBytes();
 		const dir = opts.directory || app.getPath('downloads');
 		let filePath;
+
 		if (opts.filename) {
 			filePath = path.join(dir, opts.filename);
 		} else {
 			filePath = unusedFilename.sync(path.join(dir, item.getFilename()));
 		}
+
 		const errorMessage = opts.errorMessage || 'The download of {filename} was interrupted';
 		const errorTitle = opts.errorTitle || 'Download Error';
 
@@ -57,7 +66,7 @@ function registerListener(win, opts = {}, cb = () => {}) {
 				}
 
 				if (opts.unregisterWhenDone) {
-					webContents.session.removeListener('will-download', listener);
+					session.removeListener('will-download', listener);
 				}
 
 				cb(null, item);
@@ -65,17 +74,17 @@ function registerListener(win, opts = {}, cb = () => {}) {
 		});
 	};
 
-	win.webContents.session.on('will-download', listener);
+	session.on('will-download', listener);
 }
 
 module.exports = (opts = {}) => {
-	app.on('browser-window-created', (e, win) => {
-		registerListener(win, opts);
+	app.on('session-created', (session) => {
+		registerListener(session, opts);
 	});
 };
 
 module.exports.download = (win, url, opts) => new Promise((resolve, reject) => {
 	opts = Object.assign({}, opts, {unregisterWhenDone: true});
-	registerListener(win, opts, (err, item) => err ? reject(err) : resolve(item));
+	registerListener(win.webContents.session, opts, (err, item) => err ? reject(err) : resolve(item));
 	win.webContents.downloadURL(url);
 });
