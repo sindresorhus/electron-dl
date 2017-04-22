@@ -1,7 +1,6 @@
 'use strict';
 const path = require('path');
 const electron = require('electron');
-const BrowserWindow = require('electron').BrowserWindow;
 const unusedFilename = require('unused-filename');
 const pupa = require('pupa');
 
@@ -15,7 +14,7 @@ function registerListener(session, opts = {}, cb = () => {}) {
 			hostWebContents = webContents.hostWebContents;
 		}
 
-		const win = BrowserWindow.fromWebContents(hostWebContents);
+		const win = electron.BrowserWindow.fromWebContents(hostWebContents);
 		const totalBytes = item.getTotalBytes();
 		const dir = opts.directory || app.getPath('downloads');
 		let filePath;
@@ -32,9 +31,6 @@ function registerListener(session, opts = {}, cb = () => {}) {
 		if (!opts.saveAs) {
 			item.setSavePath(filePath);
 		}
-
-		// TODO: use mime type checking for file extension when no extension can be inferred
-		// item.getMimeType()
 
 		item.on('updated', () => {
 			const ratio = item.getReceivedBytes() / totalBytes;
@@ -85,7 +81,14 @@ module.exports = (opts = {}) => {
 
 module.exports.download = (win, url, opts) => new Promise((resolve, reject) => {
 	opts = Object.assign({}, opts, {unregisterWhenDone: true});
-	registerListener(win.webContents.session, opts, (err, item) => err ? reject(err) : resolve(item));
+
+	registerListener(win.webContents.session, opts, (err, item) => {
+		if (err) {
+			reject(err);
+		} else {
+			resolve(item);
+		}
+	});
+
 	win.webContents.downloadURL(url);
 });
-

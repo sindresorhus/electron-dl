@@ -33,13 +33,9 @@
     "xo": "*"
   },
   "xo": {
-    "esnext": true,
     "envs": [
       "node",
       "browser"
-    ],
-    "rules": {
-      "import/no-extraneous-dependencies": "off"
-    }
+    ]
   }
 }
