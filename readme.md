@@ -125,6 +125,21 @@ Default: `false`
 
 Reveal the downloaded file in the system file manager, and if possible, select the file.
 
+#### showProgress
+
+Type: `boolean`<br>
+Default: `false`
+
+Show/hide the OS progress bar. Usefull when you want to show the progress to a batch of files.
+
+
+#### showMessageError
+
+Type: `boolean`<br>
+Default: `true`
+
+Show/hide a message box with the error details. Hide this message when you want to use this module on "background mode".
+
 
 ## Related
 
