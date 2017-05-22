@@ -15,7 +15,7 @@ function getFilenameFromMime(name, mime) {
 		return name;
 	}
 
-	return `${name}.${ext}`;
+	return `${name}.${ext[0]}`;
 }
 
 function registerListener(session, opts = {}, cb = () => {}) {
