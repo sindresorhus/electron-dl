@@ -3,9 +3,20 @@ const path = require('path');
 const electron = require('electron');
 const unusedFilename = require('unused-filename');
 const pupa = require('pupa');
+const extList = require('ext-list');
 
 const app = electron.app;
 const shell = electron.shell;
+
+function getFilenameFromMime(name, mime) {
+	const ext = Object.keys(extList()).filter(x => extList()[x] === mime);
+
+	if (ext.length !== 1) {
+		return name;
+	}
+
+	return `${name}.${ext}`;
+}
 
 function registerListener(session, opts = {}, cb = () => {}) {
 	const listener = (e, item, webContents) => {
@@ -22,7 +33,10 @@ function registerListener(session, opts = {}, cb = () => {}) {
 		if (opts.filename) {
 			filePath = path.join(dir, opts.filename);
 		} else {
-			filePath = unusedFilename.sync(path.join(dir, item.getFilename()));
+			const filename = item.getFilename();
+			const name = path.extname(filename) ? filename : getFilenameFromMime(filename, item.getMimeType());
+
+			filePath = unusedFilename.sync(path.join(dir, name));
 		}
 
 		const errorMessage = opts.errorMessage || 'The download of {filename} was interrupted';
