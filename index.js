@@ -28,8 +28,8 @@ function registerListener(session, opts = {}, cb = () => {}) {
 		const errorMessage = opts.errorMessage || 'The download of {filename} was interrupted';
 		const errorTitle = opts.errorTitle || 'Download Error';
 
-		const showProgress = opts.showProgress || false; // show OS progress indicator
-		const showMessageError = opts.showMessageError || true; // do not show message box with error
+		const showProgress = opts.showProgress || false; // Show/hide OS progress indicator
+		const showMessageError = opts.showMessageError || true; // Show/hide essage box with error
 
 		if (!opts.saveAs) {
 			item.setSavePath(filePath);
@@ -54,7 +54,9 @@ function registerListener(session, opts = {}, cb = () => {}) {
 			if (state === 'interrupted') {
 				const message = pupa(errorMessage, {filename: item.getFilename()});
 
-				if (opts.showMessageError) electron.dialog.showErrorBox(errorTitle, message);
+				if (opts.showMessageError) {
+					electron.dialog.showErrorBox(errorTitle, message);
+				}
 
 				cb(new Error(message));
 			} else if (state === 'completed') {
