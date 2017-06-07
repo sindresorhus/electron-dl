@@ -25,7 +25,7 @@
     "progress"
   ],
   "dependencies": {
-    "ext-list": "^2.2.0",
+    "ext-name": "^5.0.0",
     "pupa": "^1.0.0",
     "unused-filename": "^0.1.0"
   },

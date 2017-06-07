@@ -3,19 +3,19 @@ const path = require('path');
 const electron = require('electron');
 const unusedFilename = require('unused-filename');
 const pupa = require('pupa');
-const extList = require('ext-list');
+const extName = require('ext-name');
 
 const app = electron.app;
 const shell = electron.shell;
 
 function getFilenameFromMime(name, mime) {
-	const ext = Object.keys(extList()).filter(x => extList()[x] === mime);
+	const exts = extName.mime(mime);
 
-	if (ext.length !== 1) {
+	if (exts.length !== 1) {
 		return name;
 	}
 
-	return `${name}.${ext[0]}`;
+	return `${name}.${exts[0].ext}`;
 }
 
 function registerListener(session, opts = {}, cb = () => {}) {
