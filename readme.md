@@ -8,7 +8,8 @@
 - One function call instead of having to manually implement a lot of [boilerplate](index.js).
 - Saves the file to the users Downloads directory instead of prompting.
 - Bounces the Downloads directory in the dock when done. *(macOS)*
-- Shows download progress. Example on macOS:
+- Handles multiple downloads
+- Shows badge count *(macOS, linuxOS)* and download progress. Example on macOS:
 
 <img src="screenshot.png" width="82">
 
@@ -125,6 +126,20 @@ Default: `false`
 
 Reveal the downloaded file in the system file manager, and if possible, select the file.
 
+## Development
+
+To add to this library, you can manually run an instance of electron
+
+```
+npm start
+```
+
+...or you can use TDD (test driven development)
+
+```
+npm test
+npm run test:watch
+```
 
 ## Related
 
