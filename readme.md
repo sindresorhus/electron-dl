@@ -8,7 +8,8 @@
 - One function call instead of having to manually implement a lot of [boilerplate](index.js).
 - Saves the file to the users Downloads directory instead of prompting.
 - Bounces the Downloads directory in the dock when done. *(macOS)*
-- Shows download progress. Example on macOS:
+- Handles multiple downloads
+- Shows badge count *(macOS, linuxOS)* and download progress. Example on macOS:
 
 <img src="screenshot.png" width="82">
 
