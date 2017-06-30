@@ -11,10 +11,10 @@ function registerListener(session, opts = {}, cb = () => {}) {
 	let downloadItems = {};
 	const activeDownloadItems = () => Object.keys(downloadItems).filter(key => downloadItems[key].receivedBytes !== downloadItems[key].totalBytes).length;
 	const progressDownloadItems = () => {
-		const sumReceivedBytes = Object.keys(downloadItems).reduce((receivedBytes, key) => receivedBytes += downloadItems[key].receivedBytes, 0);
-		const sumTotalBytes = Object.keys(downloadItems).reduce((totalBytes, key) => totalBytes += downloadItems[key].totalBytes, 0);
+		const sumReceivedBytes = Object.keys(downloadItems).reduce((receivedBytes, key) => { receivedBytes += downloadItems[key].receivedBytes }, 0);
+		const sumTotalBytes = Object.keys(downloadItems).reduce((totalBytes, key) => { totalBytes += downloadItems[key].totalBytes }, 0);
 		return sumReceivedBytes / sumTotalBytes;
-	}
+	};
 
 	const listener = (e, item, webContents) => {
 		let hostWebContents = webContents;
@@ -23,7 +23,7 @@ function registerListener(session, opts = {}, cb = () => {}) {
 		}
 		const win = electron.BrowserWindow.fromWebContents(hostWebContents);
 
- 		const dir = opts.directory || app.getPath('downloads');
+		const dir = opts.directory || app.getPath('downloads');
 		let filePath;
 		if (opts.filename) {
 			filePath = path.join(dir, opts.filename);
@@ -44,7 +44,7 @@ function registerListener(session, opts = {}, cb = () => {}) {
 				totalBytes: item.getTotalBytes()
 			};
 
-			if (['darwin', 'linux'].indexOf(process.platform) >= 0){
+			if (['darwin', 'linux'].indexOf(process.platform) >= 0) {
 				app.setBadgeCount(activeDownloadItems());
 			}
 
@@ -58,7 +58,7 @@ function registerListener(session, opts = {}, cb = () => {}) {
 		});
 
 		item.on('done', (e, state) => {
-			if (['darwin', 'linux'].indexOf(process.platform) >= 0){
+			if (['darwin', 'linux'].indexOf(process.platform) >= 0) {
 				app.setBadgeCount(activeDownloadItems());
 			}
 
