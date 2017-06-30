@@ -41,10 +41,10 @@ function registerListener(session, opts = {}, cb = () => {}) {
 		}
 
 		item.on('updated', () => {
-			receivedBytes = completedBytes + [...downloadItems].reduce((receivedBytes, item) => {
+			receivedBytes = [...downloadItems].reduce((receivedBytes, item) => {
 				receivedBytes += item.getReceivedBytes();
 				return receivedBytes;
-			}, 0);
+			}, completedBytes);
 
 			if (['darwin', 'linux'].includes(process.platform)) {
 				app.setBadgeCount(activeDownloadItems());
