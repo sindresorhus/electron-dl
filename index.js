@@ -19,17 +19,25 @@ function getFilenameFromMime(name, mime) {
 }
 
 function registerListener(session, opts = {}, cb = () => {}) {
+	const downloadItems = new Set();
+	let receivedBytes = 0;
+	let completedBytes = 0;
+	let totalBytes = 0;
+	const activeDownloadItems = () => downloadItems.size;
+	const progressDownloadItems = () => receivedBytes / totalBytes;
+
 	const listener = (e, item, webContents) => {
+		downloadItems.add(item);
+		totalBytes += item.getTotalBytes();
+
 		let hostWebContents = webContents;
 		if (webContents.getType() === 'webview') {
 			hostWebContents = webContents.hostWebContents;
 		}
-
 		const win = electron.BrowserWindow.fromWebContents(hostWebContents);
-		const totalBytes = item.getTotalBytes();
+
 		const dir = opts.directory || app.getPath('downloads');
 		let filePath;
-
 		if (opts.filename) {
 			filePath = path.join(dir, opts.filename);
 		} else {
@@ -47,19 +55,37 @@ function registerListener(session, opts = {}, cb = () => {}) {
 		}
 
 		item.on('updated', () => {
-			const ratio = item.getReceivedBytes() / totalBytes;
+			receivedBytes = [...downloadItems].reduce((receivedBytes, item) => {
+				receivedBytes += item.getReceivedBytes();
+				return receivedBytes;
+			}, completedBytes);
+
+			if (['darwin', 'linux'].includes(process.platform)) {
+				app.setBadgeCount(activeDownloadItems());
+			}
+
 			if (!win.isDestroyed()) {
-				win.setProgressBar(ratio);
+				win.setProgressBar(progressDownloadItems());
 			}
 
 			if (typeof opts.onProgress === 'function') {
-				opts.onProgress(ratio);
+				opts.onProgress(progressDownloadItems());
 			}
 		});
 
 		item.on('done', (e, state) => {
-			if (!win.isDestroyed()) {
+			completedBytes += item.getTotalBytes();
+			downloadItems.delete(item);
+
+			if (['darwin', 'linux'].includes(process.platform)) {
+				app.setBadgeCount(activeDownloadItems());
+			}
+
+			if (!win.isDestroyed() && !activeDownloadItems()) {
 				win.setProgressBar(-1);
+				receivedBytes = 0;
+				completedBytes = 0;
+				totalBytes = 0;
 			}
 
 			if (state === 'interrupted') {
