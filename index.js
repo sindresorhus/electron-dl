@@ -8,21 +8,17 @@ const app = electron.app;
 const shell = electron.shell;
 
 function registerListener(session, opts = {}, cb = () => {}) {
-	let downloadItems = {};
-	const activeDownloadItems = () => Object.keys(downloadItems).filter(key => downloadItems[key].receivedBytes !== downloadItems[key].totalBytes).length;
-	const progressDownloadItems = () => {
-		const sumReceivedBytes = Object.keys(downloadItems).reduce((receivedBytes, key) => {
-			receivedBytes += downloadItems[key].receivedBytes;
-			return receivedBytes;
-		}, 0);
-		const sumTotalBytes = Object.keys(downloadItems).reduce((totalBytes, key) => {
-			totalBytes += downloadItems[key].totalBytes;
-			return totalBytes;
-		}, 0);
-		return sumReceivedBytes / sumTotalBytes;
-	};
+	const downloadItems = new Set();
+	let receivedBytes = 0;
+	let completedBytes = 0;
+	let totalBytes = 0;
+	const activeDownloadItems = () => downloadItems.size;
+	const progressDownloadItems = () => receivedBytes / totalBytes;
 
 	const listener = (e, item, webContents) => {
+		downloadItems.add(item);
+		totalBytes += item.getTotalBytes();
+
 		let hostWebContents = webContents;
 		if (webContents.getType() === 'webview') {
 			hostWebContents = webContents.hostWebContents;
@@ -45,10 +41,10 @@ function registerListener(session, opts = {}, cb = () => {}) {
 		}
 
 		item.on('updated', () => {
-			downloadItems[item.getStartTime()] = {
-				receivedBytes: item.getReceivedBytes(),
-				totalBytes: item.getTotalBytes()
-			};
+			receivedBytes = completedBytes + [...downloadItems].reduce((receivedBytes, item) => {
+				receivedBytes += item.getReceivedBytes();
+				return receivedBytes;
+			}, 0);
 
 			if (['darwin', 'linux'].includes(process.platform)) {
 				app.setBadgeCount(activeDownloadItems());
@@ -64,13 +60,18 @@ function registerListener(session, opts = {}, cb = () => {}) {
 		});
 
 		item.on('done', (e, state) => {
+			completedBytes += item.getTotalBytes();
+			downloadItems.delete(item);
+
 			if (['darwin', 'linux'].includes(process.platform)) {
 				app.setBadgeCount(activeDownloadItems());
 			}
 
 			if (!win.isDestroyed() && !activeDownloadItems()) {
 				win.setProgressBar(-1);
-				downloadItems = {};
+				receivedBytes = 0;
+				completedBytes = 0;
+				totalBytes = 0;
 			}
 
 			if (state === 'interrupted') {
