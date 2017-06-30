@@ -11,8 +11,14 @@ function registerListener(session, opts = {}, cb = () => {}) {
 	let downloadItems = {};
 	const activeDownloadItems = () => Object.keys(downloadItems).filter(key => downloadItems[key].receivedBytes !== downloadItems[key].totalBytes).length;
 	const progressDownloadItems = () => {
-		const sumReceivedBytes = Object.keys(downloadItems).reduce((receivedBytes, key) => { receivedBytes += downloadItems[key].receivedBytes }, 0);
-		const sumTotalBytes = Object.keys(downloadItems).reduce((totalBytes, key) => { totalBytes += downloadItems[key].totalBytes }, 0);
+		const sumReceivedBytes = Object.keys(downloadItems).reduce((receivedBytes, key) => {
+			receivedBytes += downloadItems[key].receivedBytes;
+			return receivedBytes;
+		}, 0);
+		const sumTotalBytes = Object.keys(downloadItems).reduce((totalBytes, key) => {
+			totalBytes += downloadItems[key].totalBytes;
+			return totalBytes;
+		}, 0);
 		return sumReceivedBytes / sumTotalBytes;
 	};
 
