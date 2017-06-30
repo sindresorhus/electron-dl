@@ -42,13 +42,16 @@ function registerListener(session, opts = {}, cb = () => {}) {
 		const errorMessage = opts.errorMessage || 'The download of {filename} was interrupted';
 		const errorTitle = opts.errorTitle || 'Download Error';
 
+		const showProgress = opts.showProgress || false; // Show/hide OS progress indicator
+		const showMessageError = opts.showMessageError || true; // Show/hide essage box with error
+
 		if (!opts.saveAs) {
 			item.setSavePath(filePath);
 		}
 
 		item.on('updated', () => {
 			const ratio = item.getReceivedBytes() / totalBytes;
-			if (!win.isDestroyed()) {
+			if (!win.isDestroyed() && showProgress) {
 				win.setProgressBar(ratio);
 			}
 
@@ -58,13 +61,17 @@ function registerListener(session, opts = {}, cb = () => {}) {
 		});
 
 		item.on('done', (e, state) => {
-			if (!win.isDestroyed()) {
+			if (!win.isDestroyed() && showProgress) {
 				win.setProgressBar(-1);
 			}
 
 			if (state === 'interrupted') {
 				const message = pupa(errorMessage, {filename: item.getFilename()});
-				electron.dialog.showErrorBox(errorTitle, message);
+
+				if (opts.showMessageError) {
+					electron.dialog.showErrorBox(errorTitle, message);
+				}
+
 				cb(new Error(message));
 			} else if (state === 'completed') {
 				if (process.platform === 'darwin') {
