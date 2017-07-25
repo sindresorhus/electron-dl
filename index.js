@@ -41,6 +41,7 @@ function registerListener(session, opts = {}, cb = () => {}) {
 
 		const errorMessage = opts.errorMessage || 'The download of {filename} was interrupted';
 		const errorTitle = opts.errorTitle || 'Download Error';
+		const canceledMessage = opts.canceledMessage || 'The download of {filename} was canceled';
 
 		if (!opts.saveAs) {
 			item.setSavePath(filePath);
@@ -55,6 +56,12 @@ function registerListener(session, opts = {}, cb = () => {}) {
 			if (typeof opts.onProgress === 'function') {
 				opts.onProgress(ratio);
 			}
+
+			if (typeof opts.onCancel === 'function') {
+				if (opts.onCancel()) {
+					item.cancel();
+				}
+			}
 		});
 
 		item.on('done', (e, state) => {
@@ -64,6 +71,10 @@ function registerListener(session, opts = {}, cb = () => {}) {
 
 			if (state === 'interrupted') {
 				const message = pupa(errorMessage, {filename: item.getFilename()});
+				electron.dialog.showErrorBox(errorTitle, message);
+				cb(new Error(message));
+			} else if (state === 'cancelled') {
+				const message = pupa(canceledMessage, { filename: item.getFilename() });
 				electron.dialog.showErrorBox(errorTitle, message);
 				cb(new Error(message));
 			} else if (state === 'completed') {
