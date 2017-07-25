@@ -74,7 +74,7 @@ function registerListener(session, opts = {}, cb = () => {}) {
 				electron.dialog.showErrorBox(errorTitle, message);
 				cb(new Error(message));
 			} else if (state === 'cancelled') {
-				const message = pupa(canceledMessage, { filename: item.getFilename() });
+				const message = pupa(canceledMessage, {filename: item.getFilename()});
 				electron.dialog.showErrorBox(errorTitle, message);
 				cb(new Error(message));
 			} else if (state === 'completed') {
