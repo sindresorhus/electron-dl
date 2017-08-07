@@ -8,8 +8,8 @@
 - One function call instead of having to manually implement a lot of [boilerplate](index.js).
 - Saves the file to the users Downloads directory instead of prompting.
 - Bounces the Downloads directory in the dock when done. *(macOS)*
-- Handles multiple downloads
-- Shows badge count *(macOS, linuxOS)* and download progress. Example on macOS:
+- Handles multiple downloads.
+- Shows badge count *(macOS & Linux only)* and download progress. Example on macOS:
 
 <img src="screenshot.png" width="82">
 
@@ -17,7 +17,7 @@
 ## Install
 
 ```
-$ npm install --save electron-dl
+$ npm install electron-dl
 ```
 
 
@@ -126,20 +126,21 @@ Default: `false`
 
 Reveal the downloaded file in the system file manager, and if possible, select the file.
 
+
 ## Development
 
-To add to this library, you can manually run an instance of electron
+After making changes, run the automated tests:
+
+```
+$ npm test
+```
+
+And before submitting a pull request, run the manual tests to manually verify that everything works:
 
 ```
 npm start
 ```
 
-...or you can use TDD (test driven development)
-
-```
-npm test
-npm run test:watch
-```
 
 ## Related
 
