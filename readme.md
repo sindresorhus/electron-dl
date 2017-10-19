@@ -56,6 +56,8 @@ ipcMain.on('download-btn', (e, args) => {
 
 ## API
 
+It can only be used in the [main](https://electron.atom.io/docs/glossary/#main-process) process.
+
 ### electronDl([options])
 
 ### electronDl.download(window, url, [options]): Promise<[DownloadItem](https://github.com/electron/electron/blob/master/docs/api/download-item.md)>
