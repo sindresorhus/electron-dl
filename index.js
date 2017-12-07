@@ -92,7 +92,11 @@ function registerListener(session, opts = {}, cb = () => {}) {
 				const message = pupa(errorMessage, {filename: item.getFilename()});
 				electron.dialog.showErrorBox(errorTitle, message);
 				cb(new Error(message));
-			} else if (state === 'completed') {
+			} 
+			else if (state === 'cancelled') {
+				cb(new Error('cancelled'));
+			}
+			else if (state === 'completed') {
 				if (process.platform === 'darwin') {
 					app.dock.downloadFinished(filePath);
 				}
