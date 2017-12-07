@@ -73,7 +73,7 @@ function registerListener(session, opts = {}, cb = () => {}) {
 			}
 		});
 
-		item.on('done', (e, state) => {
+		item.once('done', (e, state) => {
 			completedBytes += item.getTotalBytes();
 			downloadItems.delete(item);
 
@@ -92,6 +92,8 @@ function registerListener(session, opts = {}, cb = () => {}) {
 				const message = pupa(errorMessage, {filename: item.getFilename()});
 				electron.dialog.showErrorBox(errorTitle, message);
 				cb(new Error(message));
+			} else if (state === 'cancelled') {
+				cb(new Error('The download has been cancelled'));
 			} else if (state === 'completed') {
 				if (process.platform === 'darwin') {
 					app.dock.downloadFinished(filePath);
@@ -110,7 +112,7 @@ function registerListener(session, opts = {}, cb = () => {}) {
 		});
 	};
 
-	session.on('will-download', listener);
+	session.once('will-download', listener);
 }
 
 module.exports = (opts = {}) => {
