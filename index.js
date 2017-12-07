@@ -94,7 +94,7 @@ function registerListener(session, opts = {}, cb = () => {}) {
 				cb(new Error(message));
 			} 
 			else if (state === 'cancelled') {
-				cb(new Error('cancelled'));
+				cb(new Error('The download has been cancelled'));
 			}
 			else if (state === 'completed') {
 				if (process.platform === 'darwin') {
