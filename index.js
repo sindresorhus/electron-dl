@@ -117,6 +117,8 @@ function registerListener(session) {
 
         resolve(item);
       }
+
+      if (handlerMap.has(url)) handlerMap.delete(url);
     });
   };
 
@@ -135,13 +137,7 @@ module.exports = (opts = {}) => {
 module.exports.download = (win, url, opts) =>
   new Promise((resolve, reject) => {
     handlerMap.set(decodeURIComponent(url), { opts, resolve, reject });
-    registerListener(win.webContents.session, opts, (err, item) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(item);
-      }
-    });
+    registerListener(win.webContents.session);
 
     win.webContents.downloadURL(url);
   });
