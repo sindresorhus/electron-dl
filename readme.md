@@ -1,6 +1,6 @@
 # electron-dl [![Build Status](https://travis-ci.org/sindresorhus/electron-dl.svg?branch=master)](https://travis-ci.org/sindresorhus/electron-dl)
 
-> Simplified file downloads for your [Electron](http://electron.atom.io) app
+> Simplified file downloads for your [Electron](https://electronjs.org) app
 
 
 ## Why?
@@ -56,11 +56,11 @@ ipcMain.on('download-btn', (e, args) => {
 
 ## API
 
-It can only be used in the [main](https://electron.atom.io/docs/glossary/#main-process) process.
+It can only be used in the [main](https://electronjs.org/docs/glossary/#main-process) process.
 
 ### electronDl([options])
 
-### electronDl.download(window, url, [options]): Promise<[DownloadItem](https://github.com/electron/electron/blob/master/docs/api/download-item.md)>
+### electronDl.download(window, url, [options]): Promise<[DownloadItem](https://electronjs.org/docs/api/download-item)>
 
 ### window
 
@@ -88,14 +88,14 @@ Note: Only use this option when strictly necessary. Downloading directly without
 #### directory
 
 Type: `string`<br>
-Default: [User's downloads directory](http://electron.atom.io/docs/api/app/#appgetpathname)
+Default: [User's downloads directory](https://electronjs.org/docs/api/app/#appgetpathname)
 
 Directory to save the file in.
 
 #### filename
 
 Type: `string`<br>
-Default: [`downloadItem.getFilename()`](https://electron.atom.io/docs/api/download-item/#downloaditemgetfilename)
+Default: [`downloadItem.getFilename()`](https://electronjs.org/docs/api/download-item/#downloaditemgetfilename)
 
 Name of the saved file.
 
