@@ -128,6 +128,13 @@ Default: `false`
 
 Reveal the downloaded file in the system file manager, and if possible, select the file.
 
+#### hideBadge
+
+Type: `boolean`<br>
+Default: `false`
+
+Hides the file count badge on macOS/Linux dock icons.
+
 
 ## Development
 

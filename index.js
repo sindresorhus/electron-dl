@@ -60,7 +60,7 @@ function registerListener(session, opts = {}, cb = () => {}) {
 				return receivedBytes;
 			}, completedBytes);
 
-			if (['darwin', 'linux'].includes(process.platform)) {
+			if (!opts.hideBadge && ['darwin', 'linux'].includes(process.platform)) {
 				app.setBadgeCount(activeDownloadItems());
 			}
 
