@@ -101,6 +101,13 @@ Name of the saved file.
 
 This option only makes sense for `electronDl.download()`.
 
+#### skipBadge
+
+Type: `boolean`<br>
+Default: `false`
+
+Hides the file count badge on macOS/Linux dock icons.
+
 #### errorTitle
 
 Type: `string`<br>
