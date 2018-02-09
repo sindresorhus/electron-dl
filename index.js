@@ -98,7 +98,7 @@ function registerListener(session, opts = {}, cb = () => {}) {
 				}
 
 				if (opts.openFolderWhenDone) {
-					shell.showItemInFolder(filePath);
+					shell.showItemInFolder(path.join(dir, item.getFilename()));
 				}
 
 				if (opts.unregisterWhenDone) {
