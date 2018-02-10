@@ -102,7 +102,7 @@ function registerListener(session, options, cb = () => {}) {
 				}
 
 				if (options.openFolderWhenDone) {
-					shell.showItemInFolder(filePath);
+					shell.showItemInFolder(path.join(dir, item.getFilename()));
 				}
 
 				if (options.unregisterWhenDone) {
