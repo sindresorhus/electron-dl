@@ -18,13 +18,17 @@ function getFilenameFromMime(name, mime) {
 	return `${name}.${exts[0].ext}`;
 }
 
-function registerListener(session, opts = {}, cb = () => {}) {
+function registerListener(session, options, cb = () => {}) {
 	const downloadItems = new Set();
 	let receivedBytes = 0;
 	let completedBytes = 0;
 	let totalBytes = 0;
 	const activeDownloadItems = () => downloadItems.size;
 	const progressDownloadItems = () => receivedBytes / totalBytes;
+
+	options = Object.assign({
+		showBadge: true
+	}, options);
 
 	const listener = (e, item, webContents) => {
 		downloadItems.add(item);
@@ -36,10 +40,10 @@ function registerListener(session, opts = {}, cb = () => {}) {
 		}
 		const win = electron.BrowserWindow.fromWebContents(hostWebContents);
 
-		const dir = opts.directory || app.getPath('downloads');
+		const dir = options.directory || app.getPath('downloads');
 		let filePath;
-		if (opts.filename) {
-			filePath = path.join(dir, opts.filename);
+		if (options.filename) {
+			filePath = path.join(dir, options.filename);
 		} else {
 			const filename = item.getFilename();
 			const name = path.extname(filename) ? filename : getFilenameFromMime(filename, item.getMimeType());
@@ -47,10 +51,10 @@ function registerListener(session, opts = {}, cb = () => {}) {
 			filePath = unusedFilename.sync(path.join(dir, name));
 		}
 
-		const errorMessage = opts.errorMessage || 'The download of {filename} was interrupted';
-		const errorTitle = opts.errorTitle || 'Download Error';
+		const errorMessage = options.errorMessage || 'The download of {filename} was interrupted';
+		const errorTitle = options.errorTitle || 'Download Error';
 
-		if (!opts.saveAs) {
+		if (!options.saveAs) {
 			item.setSavePath(filePath);
 		}
 
@@ -60,7 +64,7 @@ function registerListener(session, opts = {}, cb = () => {}) {
 				return receivedBytes;
 			}, completedBytes);
 
-			if (['darwin', 'linux'].includes(process.platform)) {
+			if (options.showBadge && ['darwin', 'linux'].includes(process.platform)) {
 				app.setBadgeCount(activeDownloadItems());
 			}
 
@@ -68,8 +72,8 @@ function registerListener(session, opts = {}, cb = () => {}) {
 				win.setProgressBar(progressDownloadItems());
 			}
 
-			if (typeof opts.onProgress === 'function') {
-				opts.onProgress(progressDownloadItems());
+			if (typeof options.onProgress === 'function') {
+				options.onProgress(progressDownloadItems());
 			}
 		});
 
@@ -77,7 +81,7 @@ function registerListener(session, opts = {}, cb = () => {}) {
 			completedBytes += item.getTotalBytes();
 			downloadItems.delete(item);
 
-			if (['darwin', 'linux'].includes(process.platform)) {
+			if (options.showBadge && ['darwin', 'linux'].includes(process.platform)) {
 				app.setBadgeCount(activeDownloadItems());
 			}
 
@@ -97,11 +101,11 @@ function registerListener(session, opts = {}, cb = () => {}) {
 					app.dock.downloadFinished(filePath);
 				}
 
-				if (opts.openFolderWhenDone) {
+				if (options.openFolderWhenDone) {
 					shell.showItemInFolder(path.join(dir, item.getFilename()));
 				}
 
-				if (opts.unregisterWhenDone) {
+				if (options.unregisterWhenDone) {
 					session.removeListener('will-download', listener);
 				}
 
@@ -113,16 +117,16 @@ function registerListener(session, opts = {}, cb = () => {}) {
 	session.on('will-download', listener);
 }
 
-module.exports = (opts = {}) => {
+module.exports = (options = {}) => {
 	app.on('session-created', session => {
-		registerListener(session, opts);
+		registerListener(session, options);
 	});
 };
 
-module.exports.download = (win, url, opts) => new Promise((resolve, reject) => {
-	opts = Object.assign({}, opts, {unregisterWhenDone: true});
+module.exports.download = (win, url, options) => new Promise((resolve, reject) => {
+	options = Object.assign({}, options, {unregisterWhenDone: true});
 
-	registerListener(win.webContents.session, opts, (err, item) => {
+	registerListener(win.webContents.session, options, (err, item) => {
 		if (err) {
 			reject(err);
 		} else {

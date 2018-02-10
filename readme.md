@@ -128,6 +128,12 @@ Default: `false`
 
 Reveal the downloaded file in the system file manager, and if possible, select the file.
 
+#### showBadge
+
+Type: `boolean`<br>
+Default: `true`
+
+Shows the file count badge on macOS/Linux dock icons when download is in progress.
 
 ## Development
 
