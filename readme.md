@@ -121,6 +121,12 @@ Type: `Function`
 
 Optional callback that receives a number between `0` and `1` representing the progress of the current download.
 
+#### onCancel
+
+Type: `Function`
+
+Optional callback that receives on downloadItem for which the download has been cancelled.
+
 #### openFolderWhenDone
 
 Type: `boolean`<br>
