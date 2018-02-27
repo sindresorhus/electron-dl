@@ -125,7 +125,7 @@ Optional callback that receives a number between `0` and `1` representing the pr
 
 Type: `Function`
 
-Optional callback that receives on downloadItem for which the download has been cancelled.
+Optional callback that receives the downloadItem for which the download has been cancelled.
 
 #### openFolderWhenDone
 
