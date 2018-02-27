@@ -92,7 +92,11 @@ function registerListener(session, options, cb = () => {}) {
 				totalBytes = 0;
 			}
 
-			if (state === 'interrupted') {
+			if (state === 'cancelled') {
+				if (typeof options.onCancel === 'function') {
+					options.onCancel(item);
+				}
+			} else if (state === 'interrupted') {
 				const message = pupa(errorMessage, {filename: item.getFilename()});
 				electron.dialog.showErrorBox(errorTitle, message);
 				cb(new Error(message));
