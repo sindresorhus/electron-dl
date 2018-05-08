@@ -96,7 +96,7 @@ function registerListener(session, options, cb = () => {}) {
 				totalBytes = 0;
 			}
       
-      if (options.unregisterWhenDone) {
+			if (options.unregisterWhenDone) {
 				session.removeListener('will-download', listener);
 			}
 
