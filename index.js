@@ -5,8 +5,7 @@ const unusedFilename = require('unused-filename');
 const pupa = require('pupa');
 const extName = require('ext-name');
 
-const app = electron.app;
-const shell = electron.shell;
+const {app, shell} = electron;
 
 function getFilenameFromMime(name, mime) {
 	const exts = extName.mime(mime);
@@ -36,7 +35,7 @@ function registerListener(session, options, cb = () => {}) {
 
 		let hostWebContents = webContents;
 		if (webContents.getType() === 'webview') {
-			hostWebContents = webContents.hostWebContents;
+			({hostWebContents} = webContents);
 		}
 		const win = electron.BrowserWindow.fromWebContents(hostWebContents);
 

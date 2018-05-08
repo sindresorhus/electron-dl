@@ -23,7 +23,7 @@ test.beforeEach(async t => {
 });
 
 test('Download a single file', async t => {
-	const client = t.context.spectron.client;
+	const {client} = t.context.spectron;
 	await client.waitUntilWindowLoaded();
 	await client.url(`http://localhost:8080/index.html?files=${JSON.stringify(t.context.files)}`);
 	await client.waitForExist(`[data-unique-filename="${t.context.files[0]}"]`);
@@ -33,7 +33,7 @@ test('Download a single file', async t => {
 });
 
 test('Download a couple files', async t => {
-	const client = t.context.spectron.client;
+	const {client} = t.context.spectron;
 	await client.waitUntilWindowLoaded();
 	await client.url(`http://localhost:8080/index.html?files=${JSON.stringify(t.context.files)}`);
 	await client.waitForExist(`[data-unique-filename="${t.context.files[1]}"]`);
