@@ -58,6 +58,10 @@ function registerListener(session, options, cb = () => {}) {
 			item.setSavePath(filePath);
 		}
 
+		if (typeof options.onStarted === 'function') {
+			options.onStarted(item);
+		}
+
 		item.on('updated', () => {
 			receivedBytes = [...downloadItems].reduce((receivedBytes, item) => {
 				receivedBytes += item.getReceivedBytes();
@@ -91,6 +95,10 @@ function registerListener(session, options, cb = () => {}) {
 				completedBytes = 0;
 				totalBytes = 0;
 			}
+      
+      if (options.unregisterWhenDone) {
+				session.removeListener('will-download', listener);
+			}
 
 			if (state === 'cancelled') {
 				if (typeof options.onCancel === 'function') {
@@ -107,10 +115,6 @@ function registerListener(session, options, cb = () => {}) {
 
 				if (options.openFolderWhenDone) {
 					shell.showItemInFolder(path.join(dir, item.getFilename()));
-				}
-
-				if (options.unregisterWhenDone) {
-					session.removeListener('will-download', listener);
 				}
 
 				cb(null, item);

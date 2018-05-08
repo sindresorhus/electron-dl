@@ -115,6 +115,13 @@ Default: `The download of {filename} was interrupted`
 
 Message of the error dialog. `{filename}` is replaced with the name of the actual file. Can be customized for localization.
 
+#### onStarted
+
+Type: `Function`
+
+Optional callback that receives the [download item](https://electronjs.org/docs/api/download-item).
+You can use this for advanced handling such as canceling the item like `item.cancel()`.
+
 #### onProgress
 
 Type: `Function`
