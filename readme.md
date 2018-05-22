@@ -101,6 +101,13 @@ Name of the saved file.
 
 This option only makes sense for `electronDl.download()`.
 
+#### showErrorDialog
+
+Type: `boolean`<br>
+Default: `true`
+
+Show error dialog
+
 #### errorTitle
 
 Type: `string`<br>
