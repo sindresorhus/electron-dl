@@ -4,9 +4,9 @@ const electron = require('electron');
 const unusedFilename = require('unused-filename');
 const pupa = require('pupa');
 const extName = require('ext-name');
-const _ = require('lodash')
+const _ = require('lodash');
 
-const { app, shell } = electron;
+const {app, shell} = electron;
 
 function getFilenameFromMime(name, mime) {
 	const exts = extName.mime(mime);
@@ -25,14 +25,12 @@ let receivedBytes = 0;
 let completedBytes = 0;
 let totalBytes = 0;
 const activeDownloadItems = () => downloadItems.size;
-const progressDownloadItems = (item) => {
+const progressDownloadItems = function (item) {
 	if (item) {
-		return item.getReceivedBytes() / item.getTotalBytes()
+		return item.getReceivedBytes() / item.getTotalBytes();
 	}
-	else {
-		return receivedBytes / totalBytes;
-	}
-}
+	return receivedBytes / totalBytes;
+};
 
 function registerListener(session) {
 	const listener = (e, item, webContents) => {
@@ -40,16 +38,16 @@ function registerListener(session) {
 		const defaultHanlder = {
 			options: {},
 			resolve: () => { },
-			reject: () => { },
+			reject: () => { }
 		};
-		const { options, resolve, reject } = handlerMap.get(url) || defaultHanlder;
+		const {options, resolve, reject} = handlerMap.get(url) || defaultHanlder;
 
 		downloadItems.add(item);
 		totalBytes += item.getTotalBytes();
 
 		let hostWebContents = webContents;
 		if (webContents.getType() === 'webview') {
-			({ hostWebContents } = webContents);
+			({hostWebContents} = webContents);
 		}
 		const win = electron.BrowserWindow.fromWebContents(hostWebContents);
 
@@ -106,7 +104,7 @@ function registerListener(session) {
 			}
 
 			if (state === 'interrupted') {
-				const message = pupa(errorMessage, { filename: item.getFilename() });
+				const message = pupa(errorMessage, {filename: item.getFilename()});
 				electron.dialog.showErrorBox(errorTitle, message);
 				reject(new Error(message));
 			} else if (state === 'cancelled') {
@@ -122,7 +120,9 @@ function registerListener(session) {
 
 				resolve(item);
 			}
-			if (handlerMap.has(url)) handlerMap.delete(url);
+			if (handlerMap.has(url)) {
+				handlerMap.delete(url);
+			}
 		});
 	};
 
@@ -139,9 +139,9 @@ module.exports = (options = {}) => {
 };
 
 module.exports.download = (win, url, options) => new Promise((resolve, reject) => {
-	options = Object.assign({}, options, { unregisterWhenDone: true });
+	options = Object.assign({}, options, {unregisterWhenDone: true});
 
-	handlerMap.set(decodeURIComponent(url), { options, resolve, reject });
+	handlerMap.set(decodeURIComponent(url), {options, resolve, reject});
 	registerListener(win.webContents.session);
 
 	win.webContents.downloadURL(url);
