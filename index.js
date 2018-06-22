@@ -4,6 +4,7 @@ const electron = require('electron');
 const unusedFilename = require('unused-filename');
 const pupa = require('pupa');
 const extName = require('ext-name');
+const _  = require('lodash')
 
 const {app, shell} = electron;
 
@@ -24,11 +25,18 @@ let receivedBytes = 0;
 let completedBytes = 0;
 let totalBytes = 0;
 const activeDownloadItems = () => downloadItems.size;
-const progressDownloadItems = () => receivedBytes / totalBytes;
+const progressDownloadItems = (item) => {
+  if(item) {
+    return item.getReceivedBytes() / item.getTotalBytes()
+  }
+  else {
+    return receivedBytes / totalBytes;
+  }
+}
 
 function registerListener(session) {
   const listener = (e, item, webContents) => {
-    const url = decodeURIComponent(item.getURL());
+    const url = decodeURIComponent(_.first(item.getURLChain()));
     const defaultHanlder = {
       options: {},
       resolve: () => {},
@@ -78,7 +86,7 @@ function registerListener(session) {
       }
 
       if (typeof options.onProgress === 'function') {
-        options.onProgress(progressDownloadItems());
+        options.onProgress(progressDownloadItems(item));
       }
     });
 

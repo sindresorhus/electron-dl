@@ -26,6 +26,7 @@
 	],
 	"dependencies": {
 		"ext-name": "^5.0.0",
+		"lodash": "^4.17.10",
 		"pupa": "^1.0.0",
 		"unused-filename": "^1.0.0"
 	},
