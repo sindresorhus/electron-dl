@@ -150,7 +150,8 @@ module.exports = (options = {}) => {
 module.exports.download = (win, url, options) => new Promise((resolve, reject) => {
 	options = Object.assign({}, options, {unregisterWhenDone: true});
 
-	handlerMap.set(decodeURIComponent(url), {options, resolve, reject});
+	const key = decodeURIComponent(url);
+	handlerMap.set(key, {options, resolve, reject});
 	registerListener(win.webContents.session);
 	win.on('close', () => unregisterListener(win.webContents.session));
 
