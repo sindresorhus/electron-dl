@@ -34,13 +34,15 @@ const progressDownloadItems = function (item) {
 
 function registerListener(session) {
 	const listener = (e, item, webContents) => {
-		const url = decodeURIComponent(_.first(item.getURLChain()));
+		const urlChains = item.getURLChain();
+		const originUrl = _.first(urlChains);
+		const key = decodeURIComponent(originUrl);
 		const defaultHanlder = {
 			options: {},
 			resolve: () => { },
 			reject: () => { }
 		};
-		const {options, resolve, reject} = handlerMap.get(url) || defaultHanlder;
+		const {options, resolve, reject} = handlerMap.get(key) || defaultHanlder;
 
 		downloadItems.add(item);
 		totalBytes += item.getTotalBytes();
@@ -120,8 +122,8 @@ function registerListener(session) {
 
 				resolve(item);
 			}
-			if (handlerMap.has(url)) {
-				handlerMap.delete(url);
+			if (handlerMap.has(key)) {
+				handlerMap.delete(key);
 			}
 		});
 	};
@@ -132,9 +134,16 @@ function registerListener(session) {
 	}
 }
 
+function unregisterListener (session) {
+	if (sessionListenerMap.has(session)) {
+		sessionListenerMap.delete(session);
+	}
+}
+
 module.exports = (options = {}) => {
 	app.on('session-created', session => {
 		registerListener(session, options);
+		app.on('close', () => unregisterListener(session));
 	});
 };
 
@@ -143,6 +152,7 @@ module.exports.download = (win, url, options) => new Promise((resolve, reject) =
 
 	handlerMap.set(decodeURIComponent(url), {options, resolve, reject});
 	registerListener(win.webContents.session);
+	win.on('close', () => unregisterListener(win.webContents.session));
 
 	win.webContents.downloadURL(url);
 });
