@@ -4,6 +4,7 @@ const electron = require('electron');
 const unusedFilename = require('unused-filename');
 const pupa = require('pupa');
 const extName = require('ext-name');
+const _ = require('lodash');
 
 const {app, shell} = electron;
 
@@ -17,19 +18,32 @@ function getFilenameFromMime(name, mime) {
 	return `${name}.${exts[0].ext}`;
 }
 
-function registerListener(session, options, cb = () => {}) {
-	const downloadItems = new Set();
-	let receivedBytes = 0;
-	let completedBytes = 0;
-	let totalBytes = 0;
-	const activeDownloadItems = () => downloadItems.size;
-	const progressDownloadItems = () => receivedBytes / totalBytes;
+const sessionListenerMap = new Map();
+const handlerMap = new Map();
+const downloadItems = new Set();
+let receivedBytes = 0;
+let completedBytes = 0;
+let totalBytes = 0;
+const activeDownloadItems = () => downloadItems.size;
+const progressDownloadItems = function (item) {
+	if (item) {
+		return item.getReceivedBytes() / item.getTotalBytes();
+	}
+	return receivedBytes / totalBytes;
+};
 
-	options = Object.assign({
-		showBadge: true
-	}, options);
-
+function registerListener(session) {
 	const listener = (e, item, webContents) => {
+		const urlChains = item.getURLChain();
+		const originUrl = _.first(urlChains);
+		const key = decodeURIComponent(originUrl);
+		const defaultHanlder = {
+			options: {},
+			resolve: () => { },
+			reject: () => { }
+		};
+		const {options, resolve, reject} = handlerMap.get(key) || defaultHanlder;
+
 		downloadItems.add(item);
 		totalBytes += item.getTotalBytes();
 
@@ -57,17 +71,13 @@ function registerListener(session, options, cb = () => {}) {
 			item.setSavePath(filePath);
 		}
 
-		if (typeof options.onStarted === 'function') {
-			options.onStarted(item);
-		}
-
 		item.on('updated', () => {
 			receivedBytes = [...downloadItems].reduce((receivedBytes, item) => {
 				receivedBytes += item.getReceivedBytes();
 				return receivedBytes;
 			}, completedBytes);
 
-			if (options.showBadge && ['darwin', 'linux'].includes(process.platform)) {
+			if (['darwin', 'linux'].includes(process.platform)) {
 				app.setBadgeCount(activeDownloadItems());
 			}
 
@@ -76,15 +86,15 @@ function registerListener(session, options, cb = () => {}) {
 			}
 
 			if (typeof options.onProgress === 'function') {
-				options.onProgress(progressDownloadItems());
+				options.onProgress(progressDownloadItems(item));
 			}
 		});
 
-		item.on('done', (e, state) => {
+		item.once('done', (e, state) => {
 			completedBytes += item.getTotalBytes();
 			downloadItems.delete(item);
 
-			if (options.showBadge && ['darwin', 'linux'].includes(process.platform)) {
+			if (['darwin', 'linux'].includes(process.platform)) {
 				app.setBadgeCount(activeDownloadItems());
 			}
 
@@ -95,51 +105,55 @@ function registerListener(session, options, cb = () => {}) {
 				totalBytes = 0;
 			}
 
-			if (options.unregisterWhenDone) {
-				session.removeListener('will-download', listener);
-			}
-
-			if (state === 'cancelled') {
-				if (typeof options.onCancel === 'function') {
-					options.onCancel(item);
-				}
-			} else if (state === 'interrupted') {
+			if (state === 'interrupted') {
 				const message = pupa(errorMessage, {filename: item.getFilename()});
 				electron.dialog.showErrorBox(errorTitle, message);
-				cb(new Error(message));
+				reject(new Error(message));
+			} else if (state === 'cancelled') {
+				reject(new Error('The download has been cancelled'));
 			} else if (state === 'completed') {
 				if (process.platform === 'darwin') {
 					app.dock.downloadFinished(filePath);
 				}
 
 				if (options.openFolderWhenDone) {
-					shell.showItemInFolder(path.join(dir, item.getFilename()));
+					shell.showItemInFolder(filePath);
 				}
 
-				cb(null, item);
+				resolve(item);
+			}
+			if (handlerMap.has(key)) {
+				handlerMap.delete(key);
 			}
 		});
 	};
 
-	session.on('will-download', listener);
+	if (!sessionListenerMap.get(session)) {
+		sessionListenerMap.set(session, true);
+		session.on('will-download', listener);
+	}
+}
+
+function unregisterListener (session) {
+	if (sessionListenerMap.has(session)) {
+		sessionListenerMap.delete(session);
+	}
 }
 
 module.exports = (options = {}) => {
 	app.on('session-created', session => {
 		registerListener(session, options);
+		app.on('close', () => unregisterListener(session));
 	});
 };
 
 module.exports.download = (win, url, options) => new Promise((resolve, reject) => {
 	options = Object.assign({}, options, {unregisterWhenDone: true});
 
-	registerListener(win.webContents.session, options, (err, item) => {
-		if (err) {
-			reject(err);
-		} else {
-			resolve(item);
-		}
-	});
+	const key = decodeURIComponent(url);
+	handlerMap.set(key, {options, resolve, reject});
+	registerListener(win.webContents.session);
+	win.on('close', () => unregisterListener(win.webContents.session));
 
 	win.webContents.downloadURL(url);
 });
