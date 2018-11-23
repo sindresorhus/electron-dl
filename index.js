@@ -42,7 +42,9 @@ function registerListener(session) {
 			resolve: () => { },
 			reject: () => { }
 		};
-		const {options, resolve, reject} = handlerMap.get(key) || defaultHanlder;
+
+    var handlers = handlerMap.get(key);
+    const {options, resolve, reject} = handlers || defaultHanlder;
 
 		downloadItems.add(item);
 		totalBytes += item.getTotalBytes();
@@ -71,7 +73,34 @@ function registerListener(session) {
 			item.setSavePath(filePath);
 		}
 
-		item.on('updated', () => {
+		item.on('updated', (e, state) => {
+      if (handlers.retryCount === 3) {
+        item.removeAllListeners();
+        reject(new Error(`Failed to start download for ${key}`));
+      }
+
+      if (state === 'interrupted' && item.canResume()) {
+        // This may a flash network interuption, we can retry a few times
+        setTimeout(() => {
+          handlers.retryCount++;
+          item.resume();
+        }, 5000)
+      }
+
+      var updateProgress = progressDownloadItems(item);
+      if (updateProgress === handlers.progress) {
+				// No download progress, the download maybe passively interupted (network issue)
+				// Electron does not raised interupted state for this case at the moment, so we handle ourself
+        if (handlers.noProgress === 20) {
+          item.removeAllListeners();
+          reject(new Error(`Failed to download for ${key}`));
+        }
+
+        handlers.noProgress++;
+      } else {
+        handlers.progress = updateProgress;
+        handlers.noProgress = 0;
+      }
 			receivedBytes = [...downloadItems].reduce((receivedBytes, item) => {
 				receivedBytes += item.getReceivedBytes();
 				return receivedBytes;
@@ -92,6 +121,7 @@ function registerListener(session) {
 
 		item.once('done', (e, state) => {
 			completedBytes += item.getTotalBytes();
+      item.removeAllListeners();
 			downloadItems.delete(item);
 
 			if (['darwin', 'linux'].includes(process.platform)) {
@@ -128,10 +158,7 @@ function registerListener(session) {
 		});
 	};
 
-	if (!sessionListenerMap.get(session)) {
-		sessionListenerMap.set(session, true);
-		session.on('will-download', listener);
-	}
+  return listener;
 }
 
 function unregisterListener (session) {
@@ -150,10 +177,16 @@ module.exports = (options = {}) => {
 module.exports.download = (win, url, options) => new Promise((resolve, reject) => {
 	options = Object.assign({}, options, {unregisterWhenDone: true});
 
-	const key = decodeURIComponent(url);
-	handlerMap.set(key, {options, resolve, reject});
-	registerListener(win.webContents.session);
-	win.on('close', () => unregisterListener(win.webContents.session));
+  const key = decodeURIComponent(url);
+  handlerMap.set(key, {options, resolve, reject, progress: 0, retryCount: 0, noProgress: 0});
+
+  var session = win.webContents.session;
+  // Only need to register listener for new window/session
+  if (!sessionListenerMap.get(session)) {
+    sessionListenerMap.set(session, true);
+    session.on('will-download', registerListener(session));
+    win.on('close', () => unregisterListener(session));
+  }
 
 	win.webContents.downloadURL(url);
 });
