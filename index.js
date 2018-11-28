@@ -8,6 +8,10 @@ const _ = require('lodash');
 
 const {app, shell} = electron;
 
+const CONFIG = {
+	NO_PROGRESS_THRESHOLD: 20
+};
+
 function getFilenameFromMime(name, mime) {
 	const exts = extName.mime(mime);
 
@@ -76,24 +80,25 @@ function registerListener(session) {
 		item.on('updated', (e, state) => {
       if (handlers.retryCount === 3) {
         item.removeAllListeners();
-        reject(new Error(`Failed to start download for ${key}`));
+        return reject(new Error(`Failed to start download for ${key}`));
       }
 
       if (state === 'interrupted' && item.canResume()) {
         // This may a flash network interuption, we can retry a few times
         setTimeout(() => {
           handlers.retryCount++;
-          item.resume();
-        }, 5000)
+					item.resume();
+				}, 5000);
+				return;
       }
 
       var updateProgress = progressDownloadItems(item);
       if (updateProgress === handlers.progress) {
 				// No download progress, the download maybe passively interupted (network issue)
 				// Electron does not raised interupted state for this case at the moment, so we handle ourself
-        if (handlers.noProgress === 20) {
+        if (handlers.noProgress === CONFIG.NO_PROGRESS_THRESHOLD) {
           item.removeAllListeners();
-          reject(new Error(`Failed to download for ${key}`));
+          return reject(new Error(`Failed to download for ${key}`));
         }
 
         handlers.noProgress++;
