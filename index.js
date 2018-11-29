@@ -97,7 +97,8 @@ function registerListener(session) {
 				// No download progress, the download maybe passively interupted (network issue)
 				// Electron does not raised interupted state for this case at the moment, so we handle ourself
         if (handlers.noProgress === CONFIG.NO_PROGRESS_THRESHOLD) {
-          item.removeAllListeners();
+					item.removeAllListeners();
+					win.setProgressBar(-1);
           return reject(new Error(`Failed to download for ${key}`));
         }
 
@@ -145,6 +146,7 @@ function registerListener(session) {
 				electron.dialog.showErrorBox(errorTitle, message);
 				reject(new Error(message));
 			} else if (state === 'cancelled') {
+				win.setProgressBar(-1);
 				reject(new Error('The download has been cancelled'));
 			} else if (state === 'completed') {
 				if (process.platform === 'darwin') {
@@ -194,10 +196,4 @@ module.exports.download = (win, url, options) => new Promise((resolve, reject) =
   }
 
 	win.webContents.downloadURL(url);
-});
-
-module.exports.cleanUp = (win) => new Promise((resolve, reject) => {
-	if (win) {
-		win.setProgressBar(-1);
-	}
 });
