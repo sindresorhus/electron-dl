@@ -190,8 +190,14 @@ module.exports.download = (win, url, options) => new Promise((resolve, reject) =
   if (!sessionListenerMap.get(session)) {
     sessionListenerMap.set(session, true);
     session.on('will-download', registerListener(session));
-    win.on('close', () => unregisterListener(session));
+		win.on('close', () => unregisterListener(session));
   }
 
 	win.webContents.downloadURL(url);
+});
+
+module.exports.cleanUp = (win) => new Promise((resolve, reject) => {
+	if (win) {
+		win.setProgressBar(-1);
+	}
 });
