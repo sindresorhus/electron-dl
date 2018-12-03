@@ -81,7 +81,7 @@ function registerListener(session) {
     item.on('updated', (e, state) => {
       if (handlers.retryCount >= CONFIG.DOWNLOAD_MAX_RETRY) {
         item.removeAllListeners();
-        win.setProgressBar(-1);
+        _resetStats(win);
         return reject(new Error(`Failed to start download for ${key}`));
       }
 
@@ -100,7 +100,7 @@ function registerListener(session) {
         // Electron does not raised interupted state for this case at the moment, so we handle ourself
         if (handlers.noProgress === CONFIG.NO_PROGRESS_THRESHOLD) {
           item.removeAllListeners();
-          win.setProgressBar(-1);
+          _resetStats(win);
           return reject(new Error(`Failed to download for ${key}`));
         }
 
@@ -136,19 +136,14 @@ function registerListener(session) {
         app.setBadgeCount(activeDownloadItems());
       }
 
-      if (!win.isDestroyed() && !activeDownloadItems()) {
-        win.setProgressBar(-1);
-        receivedBytes = 0;
-        completedBytes = 0;
-        totalBytes = 0;
-      }
+      _resetStats(win);
 
       if (state === 'interrupted') {
         const message = pupa(errorMessage, {filename: item.getFilename()});
         electron.dialog.showErrorBox(errorTitle, message);
         reject(new Error(message));
       } else if (state === 'cancelled') {
-        win.setProgressBar(-1);
+        _resetStats(win);
         reject(new Error('The download has been cancelled'));
       } else if (state === 'completed') {
         if (process.platform === 'darwin') {
@@ -173,6 +168,15 @@ function registerListener(session) {
 function unregisterListener (session) {
   if (sessionListenerMap.has(session)) {
     sessionListenerMap.delete(session);
+  }
+}
+
+function _resetStats (win) {
+  if (!win.isDestroyed()) {
+    win.setProgressBar(-1);
+    receivedBytes = 0;
+    completedBytes = 0;
+    totalBytes = 0;
   }
 }
 
