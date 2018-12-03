@@ -174,9 +174,10 @@ function unregisterListener (session) {
 }
 
 function _resetStats (win) {
-  if (!win.isDestroyed()) {
+  if (win && !win.isDestroyed()) {
     win.setProgressBar(-1);
-  }
+	}
+
   receivedBytes = 0;
   completedBytes = 0;
   totalBytes = 0;
@@ -200,7 +201,7 @@ module.exports.download = (win, url, options) => new Promise((resolve, reject) =
   // Only need to register listener for new window/session
   if (!sessionListenerMap.get(session)) {
     sessionListenerMap.set(session, true);
-    session.on('will-download', registerListener(session));
+		session.on('will-download', () => registerListener(session));
     win.on('close', () => unregisterListener(session));
   }
 
