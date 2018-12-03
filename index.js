@@ -136,7 +136,9 @@ function registerListener(session) {
         app.setBadgeCount(activeDownloadItems());
       }
 
-      _resetStats(win);
+      if (!activeDownloadItems()) {
+        _resetStats(win);
+      }
 
       if (state === 'interrupted') {
         const message = pupa(errorMessage, {filename: item.getFilename()});
@@ -174,10 +176,11 @@ function unregisterListener (session) {
 function _resetStats (win) {
   if (!win.isDestroyed()) {
     win.setProgressBar(-1);
-    receivedBytes = 0;
-    completedBytes = 0;
-    totalBytes = 0;
   }
+  receivedBytes = 0;
+  completedBytes = 0;
+  totalBytes = 0;
+  downloadItems.clear();
 }
 
 module.exports = (options = {}) => {
