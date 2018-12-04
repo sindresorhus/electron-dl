@@ -201,7 +201,7 @@ module.exports.download = (win, url, options) => new Promise((resolve, reject) =
   // Only need to register listener for new window/session
   if (!sessionListenerMap.get(session)) {
     sessionListenerMap.set(session, true);
-		session.on('will-download', () => registerListener(session));
+		session.on('will-download', registerListener(session).bind(this));
     win.on('close', () => unregisterListener(session));
   }
 
