@@ -130,6 +130,8 @@ module.exports = (options = {}) => {
 	});
 };
 
+module.exports.default = module.exports;
+
 module.exports.download = (win, url, options) => new Promise((resolve, reject) => {
 	options = Object.assign({}, options, {unregisterWhenDone: true});
 
