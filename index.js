@@ -1,11 +1,9 @@
 'use strict';
 const path = require('path');
-const electron = require('electron');
+const {app, BrowserWindow, shell, dialog} = require('electron');
 const unusedFilename = require('unused-filename');
 const pupa = require('pupa');
 const extName = require('ext-name');
-
-const {app, shell} = electron;
 
 function getFilenameFromMime(name, mime) {
 	const exts = extName.mime(mime);
@@ -37,7 +35,8 @@ function registerListener(session, options, cb = () => {}) {
 		if (webContents.getType() === 'webview') {
 			({hostWebContents} = webContents);
 		}
-		const win = electron.BrowserWindow.fromWebContents(hostWebContents);
+
+		const win = BrowserWindow.fromWebContents(hostWebContents);
 
 		const dir = options.directory || app.getPath('downloads');
 		let filePath;
@@ -80,7 +79,7 @@ function registerListener(session, options, cb = () => {}) {
 			}
 		});
 
-		item.on('done', (e, state) => {
+		item.on('done', (event, state) => {
 			completedBytes += item.getTotalBytes();
 			downloadItems.delete(item);
 
@@ -105,7 +104,7 @@ function registerListener(session, options, cb = () => {}) {
 				}
 			} else if (state === 'interrupted') {
 				const message = pupa(errorMessage, {filename: item.getFilename()});
-				electron.dialog.showErrorBox(errorTitle, message);
+				dialog.showErrorBox(errorTitle, message);
 				cb(new Error(message));
 			} else if (state === 'completed') {
 				if (process.platform === 'darwin') {

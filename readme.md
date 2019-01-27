@@ -29,14 +29,15 @@ This is probably what you want for your app.
 
 ```js
 const {app, BrowserWindow} = require('electron');
+const electronDl = require('electron-dl');
 
-require('electron-dl')();
+electronDl();
 
 let win;
-
-app.on('ready', () => {
+(async () => {
+	await app.whenReady();
 	win = new BrowserWindow();
-});
+})();
 ```
 
 ### Use it manually
@@ -44,13 +45,12 @@ app.on('ready', () => {
 This can be useful if you need download functionality in a reusable module.
 
 ```js
-const {app, BrowserWindow, ipcMain} = require('electron');
+const {BrowserWindow, ipcMain} = require('electron');
 const {download} = require('electron-dl');
 
-ipcMain.on('download-btn', (e, args) => {
-	download(BrowserWindow.getFocusedWindow(), args.url)
-		.then(dl => console.log(dl.getSavePath()))
-		.catch(console.error);
+ipcMain.on('download-button', async (event, {url}) => {
+ 	const win = BrowserWindow.getFocusedWindow();
+ 	console.log(await download(win, url));
 });
 ```
 
@@ -75,6 +75,8 @@ Type: `string`
 URL to download.
 
 ### options
+
+Type: `Object`
 
 #### saveAs
 
@@ -132,7 +134,7 @@ Optional callback that receives a number between `0` and `1` representing the pr
 
 Type: `Function`
 
-Optional callback that receives the downloadItem for which the download has been cancelled.
+Optional callback that receives the [download item](https://electronjs.org/docs/api/download-item) for which the download has been cancelled.
 
 #### openFolderWhenDone
 
@@ -147,6 +149,7 @@ Type: `boolean`<br>
 Default: `true`
 
 Shows the file count badge on macOS/Linux dock icons when download is in progress.
+
 
 ## Development
 

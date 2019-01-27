@@ -102,7 +102,6 @@ export default function electronDl(options?: Options): void;
  * 	const win = BrowserWindow.getFocusedWindow();
  * 	console.log(await download(win, url));
  * });
- *
  */
 export function download(
 	window: Electron.BrowserWindow,
