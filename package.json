@@ -11,10 +11,11 @@
 	},
 	"scripts": {
 		"start": "electron run.js",
-		"test": "xo && ava"
+		"test": "xo && ava && tsd-check"
 	},
 	"files": [
-		"index.js"
+		"index.js",
+		"index.d.ts"
 	],
 	"keywords": [
 		"electron",
@@ -37,6 +38,7 @@
 		"node-static": "^0.7.9",
 		"pify": "^3.0.0",
 		"spectron": "^3.7.2",
+		"tsd-check": "^0.3.0",
 		"uuid": "^3.1.0",
 		"xo": "*"
 	},
