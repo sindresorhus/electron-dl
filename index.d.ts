@@ -1,6 +1,7 @@
 export interface Options {
 	/**
 	 * Show a `Save As…` dialog instead of downloading immediately.
+	 *
 	 * Note: Only use this option when strictly necessary. Downloading directly without a prompt is a much better user experience.
 	 *
 	 * @default false
@@ -48,7 +49,7 @@ export interface Options {
 	onProgress?: (percent: number) => void;
 
 	/**
-	 * Optional callback that receives the downloadItem for which the download has been cancelled.
+	 * Optional callback that receives the [download item](https://electronjs.org/docs/api/download-item) for which the download has been cancelled.
 	 */
 	onCancel?: (item: Electron.DownloadItem) => void;
 
@@ -70,16 +71,14 @@ export interface Options {
 /**
  * Register the helper for all windows.
  *
- * @param options
- *
  * @example
  *
- * const {app, BrowserWindow} = require('electron');
+ * import {app, BrowserWindow} from 'electron';
+ * import electronDl from 'electron-dl';
  *
- * require('electron-dl')();
+ * electronDl();
  *
  * let win;
- *
  * app.on('ready', () => {
  * 	win = new BrowserWindow();
  * });
@@ -92,18 +91,18 @@ export default function electronDl(options?: Options): void;
  * @param window - Window to register the behavior on.
  * @param url - URL to download.
  * @param options
- * @returns A promise containing downloaded file
+ * @returns A promise for the downloaded file.
  *
  * @example
  *
- * const {app, BrowserWindow, ipcMain} = require('electron');
- * const {download} = require('electron-dl');
+ * import {BrowserWindow, ipcMain} from 'electron';
+ * import {download} from 'electron-dl';
  *
- * ipcMain.on('download-btn', (e, args) => {
- * 	download(BrowserWindow.getFocusedWindow(), args.url)
- * 	.then(dl => console.log(dl.getSavePath()))
- * 	.catch(console.error);
+ * ipcMain.on('download-button', async (event, {url}) => {
+ * 	const win = BrowserWindow.getFocusedWindow();
+ * 	console.log(await download(win, url));
  * });
+ *
  */
 export function download(
 	window: Electron.BrowserWindow,
