@@ -1,3 +1,5 @@
+import {BrowserWindow, DownloadItem} from 'electron';
+
 export interface Options {
 	/**
 	 * Show a `Save As…` dialog instead of downloading immediately.
@@ -6,14 +8,14 @@ export interface Options {
 	 *
 	 * @default false
 	 */
-	saveAs?: boolean;
+	readonly saveAs?: boolean;
 
 	/**
 	 * Directory to save the file in.
 	 *
 	 * Default: [User's downloads directory](https://electronjs.org/docs/api/app/#appgetpathname)
 	 */
-	directory?: string;
+	readonly directory?: string;
 
 	/**
 	 * Name of the saved file.
@@ -21,51 +23,51 @@ export interface Options {
 	 *
 	 * Default: [`downloadItem.getFilename()`](https://electronjs.org/docs/api/download-item/#downloaditemgetfilename)
 	 */
-	filename?: string;
+	readonly filename?: string;
 
 	/**
 	 * Title of the error dialog. Can be customized for localization.
 	 *
 	 * @default 'Download Error'
 	 */
-	errorTitle?: string;
+	readonly errorTitle?: string;
 
 	/**
 	 * Message of the error dialog. `{filename}` is replaced with the name of the actual file. Can be customized for localization.
 	 *
 	 * @default 'The download of {filename} was interrupted'
 	 */
-	errorMessage?: string;
+	readonly errorMessage?: string;
 
 	/**
 	 * Optional callback that receives the [download item](https://electronjs.org/docs/api/download-item).
 	 * You can use this for advanced handling such as canceling the item like `item.cancel()`.
 	 */
-	onStarted?: (item: Electron.DownloadItem) => void;
+	readonly onStarted?: (item: DownloadItem) => void;
 
 	/**
 	 * Optional callback that receives a number between `0` and `1` representing the progress of the current download.
 	 */
-	onProgress?: (percent: number) => void;
+	readonly onProgress?: (percent: number) => void;
 
 	/**
 	 * Optional callback that receives the [download item](https://electronjs.org/docs/api/download-item) for which the download has been cancelled.
 	 */
-	onCancel?: (item: Electron.DownloadItem) => void;
+	readonly onCancel?: (item: DownloadItem) => void;
 
 	/**
 	 * Reveal the downloaded file in the system file manager, and if possible, select the file.
 	 *
 	 * @default false
 	 */
-	openFolderWhenDone?: boolean;
+	readonly openFolderWhenDone?: boolean;
 
 	/**
 	 * Shows the file count badge on macOS/Linux dock icons when download is in progress.
 	 *
 	 * @default true
 	 */
-	showBadge?: boolean;
+	readonly showBadge?: boolean;
 }
 
 /**
@@ -79,9 +81,10 @@ export interface Options {
  * electronDl();
  *
  * let win;
- * app.on('ready', () => {
+ * (async () => {
+ * 	await app.whenReady();
  * 	win = new BrowserWindow();
- * });
+ * })();
  */
 export default function electronDl(options?: Options): void;
 
@@ -90,7 +93,6 @@ export default function electronDl(options?: Options): void;
  *
  * @param window - Window to register the behavior on.
  * @param url - URL to download.
- * @param options
  * @returns A promise for the downloaded file.
  *
  * @example
@@ -104,7 +106,7 @@ export default function electronDl(options?: Options): void;
  * });
  */
 export function download(
-	window: Electron.BrowserWindow,
+	window: BrowserWindow,
 	url: string,
 	options?: Options
-): Promise<Electron.DownloadItem>;
+): Promise<DownloadItem>;
