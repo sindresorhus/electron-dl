@@ -1,6 +1,11 @@
-import {expectType} from 'tsd-check';
+/// <reference lib="dom"/>
+/// <reference types="node"/>
+import {expectType} from 'tsd';
 import {BrowserWindow, DownloadItem} from 'electron';
-import electronDl, {download} from '.';
+import electronDl = require('.');
+import {download} from '.';
 
 expectType<void>(electronDl());
-expectType<DownloadItem>(await download(new BrowserWindow(), 'test', {errorTitle: 'Nope'}));
+expectType<Promise<DownloadItem>>(
+	download(new BrowserWindow(), 'test', {errorTitle: 'Nope'})
+);
