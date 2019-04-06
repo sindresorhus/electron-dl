@@ -11,7 +11,7 @@
 	},
 	"scripts": {
 		"start": "electron run.js",
-		"test": "xo && ava && tsd-check"
+		"test": "xo && ava && tsd"
 	},
 	"files": [
 		"index.js",
@@ -31,15 +31,16 @@
 		"unused-filename": "^1.0.0"
 	},
 	"devDependencies": {
-		"ava": "^1.2.0",
-		"cp-file": "^6.0.0",
+		"@types/node": "^11.13.0",
+		"ava": "^1.4.1",
+		"cp-file": "^6.2.0",
 		"electron": "^3.1.2",
 		"minimist": "^1.2.0",
-		"node-static": "^0.7.9",
+		"node-static": "^0.7.11",
 		"pify": "^4.0.1",
 		"spectron": "^5.0.0",
-		"tsd-check": "^0.3.0",
-		"uuid": "^3.1.0",
+		"tsd": "^0.7.2",
+		"uuid": "^3.3.2",
 		"xo": "^0.24.0"
 	},
 	"xo": {
