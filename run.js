@@ -25,7 +25,7 @@ const argv = minimist(process.argv.slice(2));
 
 	const numSampleFiles = 'files' in argv ? argv.files : 5;
 	const files = await samples.setup(numSampleFiles);
-	win.loadURL(`http://localhost:8080/index.html?files=${JSON.stringify(files)}`);
+	await win.loadURL(`http://localhost:8080/index.html?files=${JSON.stringify(files)}`);
 })();
 
 process.on('SIGINT', samples.teardown);
