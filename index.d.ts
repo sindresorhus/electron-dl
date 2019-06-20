@@ -69,6 +69,13 @@ declare namespace electronDl {
 		@default true
 		*/
 		readonly showBadge?: boolean;
+		
+		/**
+		 * Allows downloaded files to overwrite files with the same name in the directory they are saved to.
+		 *
+		 * @default false
+		 */
+		readonly allowOverwrite?: boolean;
 	}
 }
 
@@ -91,13 +98,6 @@ declare const electronDl: {
 	```
 	*/
 	(options?: electronDl.Options): void;
-
-  /**
-	 * Allows downloaded files to overwrite files with the same name in the directory they are saved to.
-	 *
-	 * @default false
-	 */
-	readonly allowOverwrite?: boolean;
 }
 
   /**
