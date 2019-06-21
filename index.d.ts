@@ -98,9 +98,8 @@ declare const electronDl: {
 	```
 	*/
 	(options?: electronDl.Options): void;
-}
 
-  /**
+  	/**
 	This can be useful if you need download functionality in a reusable module.
 
 	@param window - Window to register the behavior on.
