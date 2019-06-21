@@ -71,10 +71,10 @@ declare namespace electronDl {
 		readonly showBadge?: boolean;
 		
 		/**
-		 * Allows downloaded files to overwrite files with the same name in the directory they are saved to.
-		 *
-		 * @default false
-		 */
+		Allows downloaded files to overwrite files with the same name in the directory they are saved to.
+		
+		@default false
+		*/
 		readonly allowOverwrite?: boolean;
 	}
 }
