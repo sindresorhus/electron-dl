@@ -27,7 +27,7 @@
 	],
 	"dependencies": {
 		"ext-name": "^5.0.0",
-		"pupa": "^1.0.0",
+		"pupa": "^2.0.0",
 		"unused-filename": "^1.0.0"
 	},
 	"devDependencies": {
