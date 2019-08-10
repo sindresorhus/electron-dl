@@ -135,7 +135,9 @@ module.exports.default = module.exports;
 module.exports.download = (win, url, options) => new Promise((resolve, reject) => {
 	options = Object.assign({}, options, {unregisterWhenDone: true});
 
-	registerListener(win.webContents.session, options, (err, item) => {
+	const webContents = win.webContents || win.getWebContents();
+
+	registerListener(webContents.session, options, (err, item) => {
 		if (err) {
 			reject(err);
 		} else {
@@ -143,5 +145,5 @@ module.exports.download = (win, url, options) => new Promise((resolve, reject) =
 		}
 	});
 
-	win.webContents.downloadURL(url);
+	webContents.downloadURL(url);
 });
