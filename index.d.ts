@@ -1,4 +1,4 @@
-import {BrowserWindow, DownloadItem, FileFilter, SaveDialogOptions} from 'electron';
+import {BrowserWindow, DownloadItem, SaveDialogOptions} from 'electron';
 
 declare namespace electronDl {
 	interface Options {
