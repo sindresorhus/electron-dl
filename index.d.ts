@@ -1,4 +1,4 @@
-import {BrowserWindow, DownloadItem} from 'electron';
+import {BrowserWindow, DownloadItem, FileFilter, SaveDialogOptions} from 'electron';
 
 declare namespace electronDl {
 	interface Options {
@@ -25,6 +25,12 @@ declare namespace electronDl {
 		Default: [`downloadItem.getFilename()`](https://electronjs.org/docs/api/download-item/#downloaditemgetfilename)
 		*/
 		readonly filename?: string;
+
+		/**
+		 * Options for a custom save dialog
+		 * See https://electronjs.org/docs/api/dialog#dialogshowsavedialogsyncbrowserwindow-options
+		 */
+		readonly saveDialogOptions?: SaveDialogOptions;
 
 		/**
 		Title of the error dialog. Can be customized for localization.
