@@ -117,6 +117,13 @@ Default: `The download of {filename} was interrupted`
 
 Message of the error dialog. `{filename}` is replaced with the name of the actual file. Can be customized for localization.
 
+#### fullProgressUpdate
+
+Type: `boolean`<br>
+Default: `false`
+
+If set to `true` the `onProgress` callback will receive an object containing additional information about the progress.
+
 #### onStarted
 
 Type: `Function`
@@ -128,7 +135,15 @@ You can use this for advanced handling such as canceling the item like `item.can
 
 Type: `Function`
 
-Optional callback that receives a number between `0` and `1` representing the progress of the current download.
+Optional callback that receives a number between `0` and `1` representing the progress of the current download if `fullProgressUpdate` is `false` or an an object containing additional information about the progress otherwise.
+
+```
+{
+    percent: 0.1,
+    transferred: 100,
+    total: 1000
+}
+```
 
 #### onCancel
 

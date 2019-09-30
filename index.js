@@ -75,7 +75,15 @@ function registerListener(session, options, cb = () => {}) {
 			}
 
 			if (typeof options.onProgress === 'function') {
-				options.onProgress(progressDownloadItems());
+				if (options.fullProgressUpdate) {
+					options.onProgress({
+						percent: receivedBytes / totalBytes,
+						transferred: receivedBytes,
+						total: totalBytes
+					});
+				} else {
+					options.onProgress(progressDownloadItems());
+				}
 			}
 		});
 
