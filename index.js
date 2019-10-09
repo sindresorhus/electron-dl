@@ -31,8 +31,13 @@ function registerListener(session, options, cb = () => {}) {
 		downloadItems.add(item);
 		totalBytes += item.getTotalBytes();
 
+		const type = webContents.getType();
+		if (type === 'browserView') {
+			return;
+		}
+
 		let hostWebContents = webContents;
-		if (webContents.getType() === 'webview') {
+		if (type === 'webview') {
 			({hostWebContents} = webContents);
 		}
 
