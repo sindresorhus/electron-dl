@@ -1,6 +1,6 @@
 {
 	"name": "electron-dl",
-	"version": "1.14.0",
+	"version": "1.15.0",
 	"description": "Simplified file downloads for your Electron app",
 	"license": "MIT",
 	"repository": "sindresorhus/electron-dl",
@@ -26,9 +26,9 @@
 		"progress"
 	],
 	"dependencies": {
-		"ext-name": "^5.0.0",
-		"pupa": "^1.0.0",
-		"unused-filename": "^1.0.0"
+		"ext-name": "5.0.0",
+		"pupa": "2.0.1",
+		"unused-filename": "2.1.0"
 	},
 	"devDependencies": {
 		"@types/node": "^11.13.0",
