@@ -128,7 +128,7 @@ You can use this for advanced handling such as canceling the item like `item.can
 
 Type: `Function`
 
-Optional callback that receives a number between `0` and `1` representing the progress of the current download.
+Optional callback that receives a number between `0` and `1` representing the total progress of all the current downloads.
 
 #### onCancel
 
