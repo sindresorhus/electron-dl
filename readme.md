@@ -58,9 +58,9 @@ ipcMain.on('download-button', async (event, {url}) => {
 
 It can only be used in the [main](https://electronjs.org/docs/glossary/#main-process) process.
 
-### electronDl([options])
+### electronDl(options?)
 
-### electronDl.download(window, url, [options]): Promise<[DownloadItem](https://electronjs.org/docs/api/download-item)>
+### electronDl.download(window, url, options?): Promise<[DownloadItem](https://electronjs.org/docs/api/download-item)>
 
 ### window
 
@@ -76,11 +76,11 @@ URL to download.
 
 ### options
 
-Type: `Object`
+Type: `object`
 
 #### saveAs
 
-Type: `boolean`<br>
+Type: `boolean`\
 Default: `false`
 
 Show a `Save As…` dialog instead of downloading immediately.
@@ -89,14 +89,14 @@ Note: Only use this option when strictly necessary. Downloading directly without
 
 #### directory
 
-Type: `string`<br>
+Type: `string`\
 Default: [User's downloads directory](https://electronjs.org/docs/api/app/#appgetpathname)
 
 Directory to save the file in.
 
 #### filename
 
-Type: `string`<br>
+Type: `string`\
 Default: [`downloadItem.getFilename()`](https://electronjs.org/docs/api/download-item/#downloaditemgetfilename)
 
 Name of the saved file.
@@ -105,15 +105,15 @@ This option only makes sense for `electronDl.download()`.
 
 #### errorTitle
 
-Type: `string`<br>
-Default: `Download Error`
+Type: `string`\
+Default: `'Download Error'`
 
 Title of the error dialog. Can be customized for localization.
 
 #### errorMessage
 
-Type: `string`<br>
-Default: `The download of {filename} was interrupted`
+Type: `string`\
+Default: `'The download of {filename} was interrupted'`
 
 Message of the error dialog. `{filename}` is replaced with the name of the actual file. Can be customized for localization.
 
@@ -138,14 +138,14 @@ Optional callback that receives the [download item](https://electronjs.org/docs/
 
 #### openFolderWhenDone
 
-Type: `boolean`<br>
+Type: `boolean`\
 Default: `false`
 
 Reveal the downloaded file in the system file manager, and if possible, select the file.
 
 #### showBadge
 
-Type: `boolean`<br>
+Type: `boolean`\
 Default: `true`
 
 Shows the file count badge on macOS/Linux dock icons when download is in progress.
@@ -172,8 +172,3 @@ npm start
 - [electron-context-menu](https://github.com/sindresorhus/electron-context-menu) - Context menu for your Electron app
 - [electron-store](https://github.com/sindresorhus/electron-store) - Save and load data like user preferences, app state, cache, etc
 - [electron-unhandled](https://github.com/sindresorhus/electron-unhandled) - Catch unhandled errors and promise rejections in your Electron app
-
-
-## License
-
-MIT © [Sindre Sorhus](https://sindresorhus.com)

@@ -129,9 +129,6 @@ module.exports = (options = {}) => {
 	});
 };
 
-// TODO: Remove this for the next major release
-module.exports.default = module.exports;
-
 module.exports.download = (win, url, options) => new Promise((resolve, reject) => {
 	options = Object.assign({}, options, {unregisterWhenDone: true});
 

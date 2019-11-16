@@ -115,9 +115,6 @@ declare const electronDl: {
 		url: string,
 		options?: electronDl.Options
 	): Promise<DownloadItem>;
-
-	// TODO: Remove this for the next major release
-	default: typeof electronDl;
 };
 
 export = electronDl;
