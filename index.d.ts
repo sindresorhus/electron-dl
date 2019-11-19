@@ -1,7 +1,7 @@
 import {BrowserWindow, DownloadItem} from 'electron';
 
 declare namespace electronDl {
-	interface ProgressUpdate {
+	interface Progress {
 		percent: number;
 		transferred: number;
 		total: number;
@@ -47,23 +47,15 @@ declare namespace electronDl {
 		readonly errorMessage?: string;
 
 		/**
-		If set to `true` the `onProgress` callback will receive an object containing additional information about the progress.
-
-		@default false
-		*/
-		readonly fullProgressUpdate?: boolean;
-
-		/**
 		Optional callback that receives the [download item](https://electronjs.org/docs/api/download-item).
 		You can use this for advanced handling such as canceling the item like `item.cancel()`.
 		*/
 		readonly onStarted?: (item: DownloadItem) => void;
 
 		/**
-		Optional callback that receives a number between `0` and `1` representing the progress of the current download
-		if `fullProgressUpdate` is `false` or an an object containing additional information about the progress otherwise.
+		Optional callback that receives an object containing information about the progress of the current download item.
 		*/
-		readonly onProgress?: (progressUpdate: ProgressUpdate | number) => void;
+		readonly onProgress?: (progress: Progress | number) => void;
 
 		/**
 		Optional callback that receives the [download item](https://electronjs.org/docs/api/download-item) for which the download has been cancelled.
