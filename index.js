@@ -79,7 +79,7 @@ function registerListener(session, options, cb = () => {}) {
 				const transferred = item.getReceivedBytes();
 
 				options.onProgress({
-					percent: itemTotal ? itemReceived / itemTotal : 0,
+					percent: total ? transferred / total : 0,
 					transferred,
 					total
 				});
