@@ -27,21 +27,21 @@
 	],
 	"dependencies": {
 		"ext-name": "^5.0.0",
-		"pupa": "^1.0.0",
-		"unused-filename": "^1.0.0"
+		"pupa": "^2.0.1",
+		"unused-filename": "^2.1.0"
 	},
 	"devDependencies": {
-		"@types/node": "^11.13.0",
-		"ava": "^1.4.1",
-		"cp-file": "^6.2.0",
+		"@types/node": "^12.12.8",
+		"ava": "^2.4.0",
+		"cp-file": "^7.0.0",
 		"electron": "^3.1.2",
 		"minimist": "^1.2.0",
 		"node-static": "^0.7.11",
 		"pify": "^4.0.1",
-		"spectron": "^5.0.0",
-		"tsd": "^0.7.2",
+		"spectron": "^6.0.0",
+		"tsd": "^0.11.0",
 		"uuid": "^3.3.2",
-		"xo": "^0.24.0"
+		"xo": "^0.25.3"
 	},
 	"xo": {
 		"envs": [
