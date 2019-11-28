@@ -14,7 +14,11 @@ const argv = minimist(process.argv.slice(2));
 
 	server();
 
-	const win = new electron.BrowserWindow();
+	const win = new electron.BrowserWindow({
+		webPreferences: {
+			nodeIntegration: true
+		}
+	});
 
 	win.on('closed', samples.teardown);
 
