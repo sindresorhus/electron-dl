@@ -55,7 +55,7 @@ declare namespace electronDl {
 		/**
 		Optional callback that receives an object containing information about the progress of the current download item.
 		*/
-		readonly onProgress?: (progress: Progress | number) => void;
+		readonly onProgress?: (progress: Progress) => void;
 
 		/**
 		Optional callback that receives the [download item](https://electronjs.org/docs/api/download-item) for which the download has been cancelled.
