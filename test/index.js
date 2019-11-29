@@ -44,5 +44,7 @@ test('download a couple files', async t => {
 	await client.click(`[data-unique-filename="${t.context.files[1]}"]`);
 	await client.click(`[data-unique-filename="${t.context.files[2]}"]`);
 
-	t.is(await t.context.spectron.electron.remote.app.getBadgeCount(), 2);
+	// The first download appears to finish before the second is added sometimes
+	const badgeCount = await t.context.spectron.electron.remote.app.getBadgeCount();
+	t.true(badgeCount === 1 || badgeCount === 2);
 });
