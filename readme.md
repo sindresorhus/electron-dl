@@ -133,8 +133,8 @@ Optional callback that receives an object containing information about the progr
 ```
 {
     percent: 0.1,
-    transferred: 100,
-    total: 1000
+    transferredBytes: 100,
+    totalBytes: 1000
 }
 ```
 

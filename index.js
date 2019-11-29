@@ -75,13 +75,13 @@ function registerListener(session, options, cb = () => {}) {
 			}
 
 			if (typeof options.onProgress === 'function') {
-				const total = item.getTotalBytes();
-				const transferred = item.getReceivedBytes();
+				const itemTransferredBytes = item.getReceivedBytes();
+				const itemTotalBytes = item.getTotalBytes();
 
 				options.onProgress({
-					percent: total ? transferred / total : 0,
-					transferred,
-					total
+					percent: itemTotalBytes ? itemTransferredBytes / itemTotalBytes : 0,
+					transferredBytes: itemTransferredBytes,
+					totalBytes: itemTotalBytes
 				});
 			}
 		});

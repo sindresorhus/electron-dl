@@ -3,8 +3,8 @@ import {BrowserWindow, DownloadItem} from 'electron';
 declare namespace electronDl {
 	interface Progress {
 		percent: number;
-		transferred: number;
-		total: number;
+		transferredBytes: number;
+		totalBytes: number;
 	}
 
 	interface Options {
