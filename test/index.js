@@ -46,5 +46,5 @@ test('download a couple files', async t => {
 
 	// The first download appears to finish before the second is added sometimes
 	const badgeCount = await t.context.spectron.electron.remote.app.getBadgeCount();
-	t.assert(badgeCount === 1 || badgeCount === 2);
+	t.true(badgeCount === 1 || badgeCount === 2);
 });
