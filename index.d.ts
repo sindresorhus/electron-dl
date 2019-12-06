@@ -1,6 +1,12 @@
 import {BrowserWindow, DownloadItem} from 'electron';
 
 declare namespace electronDl {
+	interface Progress {
+		percent: number;
+		transferredBytes: number;
+		totalBytes: number;
+	}
+
 	interface Options {
 		/**
 		Show a `Save As…` dialog instead of downloading immediately.
@@ -47,9 +53,9 @@ declare namespace electronDl {
 		readonly onStarted?: (item: DownloadItem) => void;
 
 		/**
-		Optional callback that receives a number between `0` and `1` representing the progress of the current download.
+		Optional callback that receives an object containing information about the progress of the current download item.
 		*/
-		readonly onProgress?: (percent: number) => void;
+		readonly onProgress?: (progress: Progress) => void;
 
 		/**
 		Optional callback that receives the [download item](https://electronjs.org/docs/api/download-item) for which the download has been cancelled.
