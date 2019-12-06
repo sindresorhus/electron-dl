@@ -130,11 +130,11 @@ Type: `Function`
 
 Optional callback that receives an object containing information about the progress of the current download item.
 
-```
+```js
 {
-    percent: 0.1,
-    transferredBytes: 100,
-    totalBytes: 1000
+	percent: 0.1,
+	transferredBytes: 100,
+	totalBytes: 1000
 }
 ```
 
