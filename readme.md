@@ -103,6 +103,13 @@ Name of the saved file.
 
 This option only makes sense for `electronDl.download()`.
 
+#### showError
+
+Type: `boolean`\
+Defalt: `true`
+
+Show Error Box when the download fails.
+
 #### errorTitle
 
 Type: `string`\
