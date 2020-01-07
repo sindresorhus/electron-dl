@@ -5,17 +5,17 @@ const unusedFilename = require('unused-filename');
 const pupa = require('pupa');
 const extName = require('ext-name');
 
-function getFilenameFromMime(name, mime) {
-	const exts = extName.mime(mime);
+const getFilenameFromMime = (name, mime) => {
+	const extensions = extName.mime(mime);
 
-	if (exts.length !== 1) {
+	if (extensions.length !== 1) {
 		return name;
 	}
 
-	return `${name}.${exts[0].ext}`;
-}
+	return `${name}.${extensions[0].ext}`;
+};
 
-function registerListener(session, options, cb = () => {}) {
+function registerListener(session, options, callback = () => {}) {
 	const downloadItems = new Set();
 	let receivedBytes = 0;
 	let completedBytes = 0;
@@ -23,11 +23,12 @@ function registerListener(session, options, cb = () => {}) {
 	const activeDownloadItems = () => downloadItems.size;
 	const progressDownloadItems = () => receivedBytes / totalBytes;
 
-	options = Object.assign({
-		showBadge: true
-	}, options);
+	options = {
+		showBadge: true,
+		...options
+	};
 
-	const listener = (e, item, webContents) => {
+	const listener = (event, item, webContents) => {
 		downloadItems.add(item);
 		totalBytes += item.getTotalBytes();
 
@@ -36,17 +37,16 @@ function registerListener(session, options, cb = () => {}) {
 			({hostWebContents} = webContents);
 		}
 
-		const win = BrowserWindow.fromWebContents(hostWebContents);
+		const window_ = BrowserWindow.fromWebContents(hostWebContents);
 
-		const dir = options.directory || app.getPath('downloads');
+		const directory = options.directory || app.getPath('downloads');
 		let filePath;
 		if (options.filename) {
-			filePath = path.join(dir, options.filename);
+			filePath = path.join(directory, options.filename);
 		} else {
 			const filename = item.getFilename();
 			const name = path.extname(filename) ? filename : getFilenameFromMime(filename, item.getMimeType());
-
-			filePath = unusedFilename.sync(path.join(dir, name));
+			filePath = unusedFilename.sync(path.join(directory, name));
 		}
 
 		const errorMessage = options.errorMessage || 'The download of {filename} was interrupted';
@@ -70,8 +70,8 @@ function registerListener(session, options, cb = () => {}) {
 				app.badgeCount = activeDownloadItems();
 			}
 
-			if (!win.isDestroyed()) {
-				win.setProgressBar(progressDownloadItems());
+			if (!window_.isDestroyed()) {
+				window_.setProgressBar(progressDownloadItems());
 			}
 
 			if (typeof options.onProgress === 'function') {
@@ -94,8 +94,8 @@ function registerListener(session, options, cb = () => {}) {
 				app.badgeCount = activeDownloadItems();
 			}
 
-			if (!win.isDestroyed() && !activeDownloadItems()) {
-				win.setProgressBar(-1);
+			if (!window_.isDestroyed() && !activeDownloadItems()) {
+				window_.setProgressBar(-1);
 				receivedBytes = 0;
 				completedBytes = 0;
 				totalBytes = 0;
@@ -112,17 +112,17 @@ function registerListener(session, options, cb = () => {}) {
 			} else if (state === 'interrupted') {
 				const message = pupa(errorMessage, {filename: item.getFilename()});
 				dialog.showErrorBox(errorTitle, message);
-				cb(new Error(message));
+				callback(new Error(message));
 			} else if (state === 'completed') {
 				if (process.platform === 'darwin') {
 					app.dock.downloadFinished(filePath);
 				}
 
 				if (options.openFolderWhenDone) {
-					shell.showItemInFolder(path.join(dir, item.getFilename()));
+					shell.showItemInFolder(path.join(directory, item.getFilename()));
 				}
 
-				cb(null, item);
+				callback(null, item);
 			}
 		});
 	};
@@ -136,16 +136,19 @@ module.exports = (options = {}) => {
 	});
 };
 
-module.exports.download = (win, url, options) => new Promise((resolve, reject) => {
-	options = Object.assign({}, options, {unregisterWhenDone: true});
+module.exports.download = (window_, url, options) => new Promise((resolve, reject) => {
+	options = {
+		...options,
+		unregisterWhenDone: true
+	};
 
-	registerListener(win.webContents.session, options, (err, item) => {
-		if (err) {
-			reject(err);
+	registerListener(window_.webContents.session, options, (error, item) => {
+		if (error) {
+			reject(error);
 		} else {
 			resolve(item);
 		}
 	});
 
-	win.webContents.downloadURL(url);
+	window_.webContents.downloadURL(url);
 });

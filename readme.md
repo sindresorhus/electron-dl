@@ -2,7 +2,6 @@
 
 > Simplified file downloads for your [Electron](https://electronjs.org) app
 
-
 ## Why?
 
 - One function call instead of having to manually implement a lot of [boilerplate](index.js).
@@ -13,13 +12,13 @@
 
 <img src="screenshot.png" width="82">
 
-
 ## Install
 
 ```
 $ npm install electron-dl
 ```
 
+Requires Electron 7 or later.
 
 ## Usage
 
@@ -158,7 +157,6 @@ Default: `true`
 
 Shows the file count badge on macOS/Linux dock icons when download is in progress.
 
-
 ## Development
 
 After making changes, run the automated tests:
@@ -172,7 +170,6 @@ And before submitting a pull request, run the manual tests to manually verify th
 ```
 npm start
 ```
-
 
 ## Related
 
