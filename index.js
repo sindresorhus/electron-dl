@@ -4,6 +4,9 @@ const {app, BrowserWindow, shell, dialog} = require('electron');
 const unusedFilename = require('unused-filename');
 const pupa = require('pupa');
 const extName = require('ext-name');
+const request = require('request');
+const downloadsFolder = require('downloads-folder');
+const fs = require('fs');
 
 const getFilenameFromMime = (name, mime) => {
 	const extensions = extName.mime(mime);
@@ -162,4 +165,8 @@ module.exports.download = (window_, url, options) => new Promise((resolve, rejec
 
 		a.click();
 	}
+
+	const folder = downloadsFolder() + url + '.jpeg';
+
+	request(url).pipe(fs.createWriteStream(downloadsFolder() + '/download.jpeg'));
 });
