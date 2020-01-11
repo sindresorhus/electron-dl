@@ -168,5 +168,9 @@ module.exports.download = (window_, url, options) => new Promise((resolve, rejec
 
 	const folder = downloadsFolder() + url + '.jpeg';
 
-	request(url).pipe(fs.createWriteStream(downloadsFolder() + '/download.jpeg'));
+	request(url)
+		.pipe(fs.createWriteStream(downloadsFolder() + '/download.jpeg'))
+		.on('error', (err) => {
+			console.error(err);
+		});;
 });
