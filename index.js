@@ -142,13 +142,24 @@ module.exports.download = (window_, url, options) => new Promise((resolve, rejec
 		unregisterWhenDone: true
 	};
 
-	registerListener(window_.webContents.session, options, (error, item) => {
-		if (error) {
-			reject(error);
-		} else {
-			resolve(item);
-		}
-	});
+	if (window_.webContents) {
+		registerListener(window_.webContents.session, options, (error, item) => {
+			if (error) {
+				reject(error);
+			} else {
+				resolve(item);
+			}
+		});
 
-	window_.webContents.downloadURL(url);
+		window_.webContents.downloadURL(url);
+		return;
+	}
+
+	if (options.saveAs) {
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = url;
+
+		a.click();
+	}
 });
