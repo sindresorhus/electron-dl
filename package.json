@@ -28,10 +28,8 @@
 		"progress"
 	],
 	"dependencies": {
-		"downloads-folder": "^1.0.2",
 		"ext-name": "^5.0.0",
 		"pupa": "^2.0.1",
-		"request": "^2.88.0",
 		"unused-filename": "^2.1.0"
 	},
 	"devDependencies": {

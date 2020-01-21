@@ -2,11 +2,13 @@
 const path = require('path');
 const {app, BrowserWindow, shell, dialog} = require('electron');
 const fs = require('fs');
+const https = require('https');
+const http = require('http');
+const stream = require('stream');
+const os = require('os');
 const unusedFilename = require('unused-filename');
 const pupa = require('pupa');
 const extName = require('ext-name');
-const request = require('request');
-const downloadsFolder = require('downloads-folder');
 
 const getFilenameFromMime = (name, mime) => {
 	const extensions = extName.mime(mime);
@@ -133,6 +135,32 @@ function registerListener(session, options, callback = () => {}) {
 	session.on('will-download', listener);
 }
 
+const downloadImageFromUrl = (url, filename) => {
+	let client = http;
+
+	if (url.toString().indexOf('https') === 0) {
+		client = https;
+	}
+
+	const request = client.request(url, response => {
+		const {Transform} = stream;
+		const data = new Transform();
+
+		response.on('data', chunk => {
+			data.push(chunk);
+		});
+
+		response.on('end', () => {
+			fs.writeFileSync(filename, data.read());
+		});
+	});
+
+	request.on('error', e => {
+		console.error(e);
+	});
+	request.end();
+};
+
 module.exports = (options = {}) => {
 	app.on('session-created', session => {
 		registerListener(session, options);
@@ -164,11 +192,8 @@ module.exports.download = (window_, url, options) => new Promise((resolve, rejec
 		a.download = url;
 
 		a.click();
+		return;
 	}
 
-	request(url)
-		.pipe(fs.createWriteStream(downloadsFolder() + '/download.jpeg'))
-		.on('error', err => {
-			console.error(err);
-		});
+	downloadImageFromUrl(url, os.homedir() + '/Downloads/image.jpeg');
 });
