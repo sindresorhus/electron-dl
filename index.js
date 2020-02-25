@@ -4,6 +4,7 @@ const {app, BrowserWindow, shell, dialog} = require('electron');
 const unusedFilename = require('unused-filename');
 const pupa = require('pupa');
 const extName = require('ext-name');
+let lastWindowCreated;
 
 const getFilenameFromMime = (name, mime) => {
 	const extensions = extName.mime(mime);
@@ -16,6 +17,7 @@ const getFilenameFromMime = (name, mime) => {
 };
 
 function registerListener(session, options, callback = () => {}) {
+	lastWindowCreated = session; 
 	const downloadItems = new Set();
 	let receivedBytes = 0;
 	let completedBytes = 0;
@@ -142,7 +144,9 @@ module.exports.download = (window_, url, options) => new Promise((resolve, rejec
 		unregisterWhenDone: true
 	};
 
-	registerListener(window_.webContents.session, options, (error, item) => {
+	const win = window_ || BrowserWindow.getFocusedWindow() || lastWindowCreated;
+
+	registerListener(win.webContents.session, options, (error, item) => {
 		if (error) {
 			reject(error);
 		} else {
@@ -150,5 +154,5 @@ module.exports.download = (window_, url, options) => new Promise((resolve, rejec
 		}
 	});
 
-	window_.webContents.downloadURL(url);
+	win.webContents.downloadURL(url);
 });
