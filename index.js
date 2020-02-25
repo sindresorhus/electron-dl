@@ -17,7 +17,6 @@ const getFilenameFromMime = (name, mime) => {
 };
 
 function registerListener(session, options, callback = () => {}) {
-	lastWindowCreated = session; 
 	const downloadItems = new Set();
 	let receivedBytes = 0;
 	let completedBytes = 0;
@@ -25,6 +24,7 @@ function registerListener(session, options, callback = () => {}) {
 	const activeDownloadItems = () => downloadItems.size;
 	const progressDownloadItems = () => receivedBytes / totalBytes;
 
+	lastWindowCreated = session;
 	options = {
 		showBadge: true,
 		...options
