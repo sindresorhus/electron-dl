@@ -1,11 +1,6 @@
 'use strict';
 const path = require('path');
-const {app, BrowserWindow, shell, dialog, session, remote} = require('electron');
-const fs = require('fs');
-const https = require('https');
-const http = require('http');
-const stream = require('stream');
-const os = require('os');
+const {app, BrowserWindow, shell, dialog, remote} = require('electron');
 const unusedFilename = require('unused-filename');
 const pupa = require('pupa');
 const extName = require('ext-name');
@@ -160,9 +155,9 @@ module.exports.download = (window_, url, options) => new Promise((resolve, rejec
 		return;
 	}
 
-	const ses = remote.session.fromPartition('persist:webview')
+	const ses = remote.session.fromPartition('persist:webview');
 
 	if (ses) {
-		ses.downloadURL(url)
+		ses.downloadURL(url);
 	}
 });
