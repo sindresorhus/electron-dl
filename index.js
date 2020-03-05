@@ -1,6 +1,6 @@
 'use strict';
 const path = require('path');
-const {app, BrowserWindow, shell, dialog} = require('electron');
+const {app, BrowserWindow, shell, dialog, session, remote} = require('electron');
 const fs = require('fs');
 const https = require('https');
 const http = require('http');
@@ -135,32 +135,6 @@ function registerListener(session, options, callback = () => {}) {
 	session.on('will-download', listener);
 }
 
-const downloadImageFromUrl = (url, filename) => {
-	let client = http;
-
-	if (url.toString().indexOf('https') === 0) {
-		client = https;
-	}
-
-	const request = client.request(url, response => {
-		const {Transform} = stream;
-		const data = new Transform();
-
-		response.on('data', chunk => {
-			data.push(chunk);
-		});
-
-		response.on('end', () => {
-			fs.writeFileSync(filename, data.read());
-		});
-	});
-
-	request.on('error', e => {
-		console.error(e);
-	});
-	request.end();
-};
-
 module.exports = (options = {}) => {
 	app.on('session-created', session => {
 		registerListener(session, options);
@@ -186,14 +160,9 @@ module.exports.download = (window_, url, options) => new Promise((resolve, rejec
 		return;
 	}
 
-	if (options.saveAs) {
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = url;
+	const ses = remote.session.fromPartition('persist:webview')
 
-		a.click();
-		return;
+	if (ses) {
+		ses.downloadURL(url)
 	}
-
-	downloadImageFromUrl(url, os.homedir() + '/Downloads/image.jpeg');
 });

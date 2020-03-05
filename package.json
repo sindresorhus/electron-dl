@@ -36,7 +36,7 @@
 		"@types/node": "^13.1.4",
 		"ava": "^2.4.0",
 		"cp-file": "^7.0.0",
-		"electron": "^7.1.7",
+		"electron": "^8.0.3",
 		"minimist": "^1.2.0",
 		"node-static": "^0.7.11",
 		"pify": "^4.0.1",
