@@ -110,7 +110,7 @@ function registerListener(session, options, callback = () => {}) {
 					options.onCancel(item);
 				}
 			} else if (state === 'interrupted') {
-				const message = pupa(errorMessage, {filename: item.getFilename()});
+				const message = pupa(errorMessage, {filename: path.basename(filePath)});
 				dialog.showErrorBox(errorTitle, message);
 				callback(new Error(message));
 			} else if (state === 'completed') {
