@@ -119,7 +119,7 @@ function registerListener(session, options, callback = () => {}) {
 				}
 
 				if (options.openFolderWhenDone) {
-					shell.showItemInFolder(path.join(directory, item.getFilename()));
+					shell.showItemInFolder(filePath);
 				}
 
 				callback(null, item);
