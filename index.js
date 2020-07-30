@@ -50,7 +50,6 @@ function registerListener(session, options, callback = () => {}) {
 		}
 
 		const errorMessage = options.errorMessage || 'The download of {filename} was interrupted';
-		const errorTitle = options.errorTitle || 'Download Error';
 
 		if (!options.saveAs) {
 			item.setSavePath(filePath);
@@ -111,7 +110,6 @@ function registerListener(session, options, callback = () => {}) {
 				}
 			} else if (state === 'interrupted') {
 				const message = pupa(errorMessage, {filename: path.basename(filePath)});
-				dialog.showErrorBox(errorTitle, message);
 				callback(new Error(message));
 			} else if (state === 'completed') {
 				if (process.platform === 'darwin') {
@@ -132,7 +130,12 @@ function registerListener(session, options, callback = () => {}) {
 
 module.exports = (options = {}) => {
 	app.on('session-created', session => {
-		registerListener(session, options);
+		registerListener(session, options, (error, _) => {
+			if (typeof error === typeof Error) {
+				const errorTitle = options.errorTitle || 'Download Error';
+				dialog.showErrorBox(errorTitle, error.message);
+			}
+		});
 	});
 };
 
