@@ -109,12 +109,16 @@ Default: `'Download Error'`
 
 Title of the error dialog. Can be customized for localization.
 
+Note: Error dialog will not be shown in `electronDl.download()`. Please handle error manually.
+
 #### errorMessage
 
 Type: `string`\
 Default: `'The download of {filename} was interrupted'`
 
 Message of the error dialog. `{filename}` is replaced with the name of the actual file. Can be customized for localization.
+
+Note: Error dialog will not be shown in `electronDl.download()`. Please handle error manually.
 
 #### onStarted
 
