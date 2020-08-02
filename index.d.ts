@@ -35,12 +35,16 @@ declare namespace electronDl {
 		/**
 		Title of the error dialog. Can be customized for localization.
 
+		Note: Error dialog will not be shown in `electronDl.download()`. Please handle error manually.
+
 		@default 'Download Error'
 		*/
 		readonly errorTitle?: string;
 
 		/**
 		Message of the error dialog. `{filename}` is replaced with the name of the actual file. Can be customized for localization.
+
+		Note: Error dialog will not be shown in `electronDl.download()`. Please handle error manually.
 
 		@default 'The download of {filename} was interrupted'
 		*/
