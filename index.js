@@ -60,10 +60,10 @@ function registerListener(session, options, callback = () => {}) {
 		}
 
 		item.on('updated', () => {
-			receivedBytes = [...downloadItems].reduce((receivedBytes, item) => {
+			receivedBytes = completedBytes;
+			for (const item of downloadItems) {
 				receivedBytes += item.getReceivedBytes();
-				return receivedBytes;
-			}, completedBytes);
+			}
 
 			if (options.showBadge && ['darwin', 'linux'].includes(process.platform)) {
 				app.badgeCount = activeDownloadItems();
