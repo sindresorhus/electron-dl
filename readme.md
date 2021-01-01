@@ -1,4 +1,4 @@
-# electron-dl [![Build Status](https://travis-ci.org/sindresorhus/electron-dl.svg?branch=master)](https://travis-ci.org/sindresorhus/electron-dl)
+# electron-dl
 
 > Simplified file downloads for your [Electron](https://electronjs.org) app
 
