@@ -32,12 +32,29 @@ function registerListener(session, options, callback = () => {}) {
 		downloadItems.add(item);
 		totalBytes += item.getTotalBytes();
 
-		let hostWebContents = webContents;
-		if (webContents.getType() === 'webview') {
-			({hostWebContents} = webContents);
-		}
+		let window_;
 
-		const window_ = BrowserWindow.fromWebContents(hostWebContents);
+		const webContentsType = webContents.getType();
+		switch (webContentsType) {
+			case 'webview':
+				window_ = BrowserWindow.fromWebContents(webContents.hostWebContents);
+				break;
+			case 'browserView':
+				BrowserWindow.getAllWindows().forEach(currentWindow => {
+					currentWindow.getBrowserViews().some(currentBV => {
+						if (currentBV.webContents.id === webContents.id) {
+							window_ = currentWindow;
+							return true;
+						}
+
+						return false;
+					});
+				});
+				break;
+			default:
+				window_ = BrowserWindow.fromWebContents(webContents);
+				break;
+		}
 
 		const directory = options.directory || app.getPath('downloads');
 		let filePath;
