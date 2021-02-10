@@ -1,6 +1,6 @@
 'use strict';
 const path = require('path');
-const {app, BrowserWindow, shell, dialog, webContents} = require('electron');
+const {app, BrowserWindow, shell, dialog} = require('electron');
 const unusedFilename = require('unused-filename');
 const pupa = require('pupa');
 const extName = require('ext-name');
@@ -15,7 +15,22 @@ const getFilenameFromMime = (name, mime) => {
 	return `${name}.${extensions[0].ext}`;
 };
 
-const getWindowFromWebcontents = (webContents) => {
+const majorElectronVersion = () => {
+	const version = process.versions.electron.split('.');
+	return parseInt(version[0], 10);
+};
+
+const getWindowFromBrowserView = webContents => {
+	for (const currentWindow of BrowserWindow.getAllWindows()) {
+		for (const currentBrowserView of currentWindow.getBrowserViews()) {
+			if (currentBrowserView.webContents.id === webContents.id) {
+				return currentWindow;
+			}
+		}
+	}
+};
+
+const getWindowFromWebcontents = webContents => {
 	let window_;
 	const webContentsType = webContents.getType();
 	switch (webContentsType) {
@@ -23,21 +38,20 @@ const getWindowFromWebcontents = (webContents) => {
 			window_ = BrowserWindow.fromWebContents(webContents.hostWebContents);
 			break;
 		case 'browserView':
-			for (let currentWindow of BrowserWindow.getAllWindows()) {
-				for( let currentBrowserView of currentWindow.getBrowserViews()) {
-					if (currentBrowserView.webContents.id === webContents.id) {
-						window_ = currentWindow;
-						break;
-					}
-				}
+			if (majorElectronVersion() < 12) {
+				window_ = getWindowFromBrowserView(webContents);
+			} else {
+				window_ = BrowserWindow.fromWebContents(webContents);
 			}
+
 			break;
 		default:
 			window_ = BrowserWindow.fromWebContents(webContents);
 			break;
 	}
+
 	return window_;
-}
+};
 
 function registerListener(session, options, callback = () => {}) {
 	const downloadItems = new Set();
