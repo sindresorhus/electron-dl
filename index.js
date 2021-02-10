@@ -1,6 +1,6 @@
 'use strict';
 const path = require('path');
-const {app, BrowserWindow, shell, dialog} = require('electron');
+const {app, BrowserWindow, shell, dialog, webContents} = require('electron');
 const unusedFilename = require('unused-filename');
 const pupa = require('pupa');
 const extName = require('ext-name');
@@ -14,6 +14,30 @@ const getFilenameFromMime = (name, mime) => {
 
 	return `${name}.${extensions[0].ext}`;
 };
+
+const getWindowFromWebcontents = (webContents) => {
+	let window_;
+	const webContentsType = webContents.getType();
+	switch (webContentsType) {
+		case 'webview':
+			window_ = BrowserWindow.fromWebContents(webContents.hostWebContents);
+			break;
+		case 'browserView':
+			for (let currentWindow of BrowserWindow.getAllWindows()) {
+				for( let currentBrowserView of currentWindow.getBrowserViews()) {
+					if (currentBrowserView.webContents.id === webContents.id) {
+						window_ = currentWindow;
+						break;
+					}
+				}
+			}
+			break;
+		default:
+			window_ = BrowserWindow.fromWebContents(webContents);
+			break;
+	}
+	return window_;
+}
 
 function registerListener(session, options, callback = () => {}) {
 	const downloadItems = new Set();
@@ -32,29 +56,7 @@ function registerListener(session, options, callback = () => {}) {
 		downloadItems.add(item);
 		totalBytes += item.getTotalBytes();
 
-		let window_;
-
-		const webContentsType = webContents.getType();
-		switch (webContentsType) {
-			case 'webview':
-				window_ = BrowserWindow.fromWebContents(webContents.hostWebContents);
-				break;
-			case 'browserView':
-				BrowserWindow.getAllWindows().forEach(currentWindow => {
-					currentWindow.getBrowserViews().some(currentBV => {
-						if (currentBV.webContents.id === webContents.id) {
-							window_ = currentWindow;
-							return true;
-						}
-
-						return false;
-					});
-				});
-				break;
-			default:
-				window_ = BrowserWindow.fromWebContents(webContents);
-				break;
-		}
+		const window_ = getWindowFromWebcontents(webContents);
 
 		const directory = options.directory || app.getPath('downloads');
 		let filePath;
