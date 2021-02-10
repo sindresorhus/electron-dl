@@ -53,7 +53,7 @@ function registerListener(session, options, callback = () => {}) {
 
 		if (!options.saveAs) {
 			item.setSavePath(filePath);
-		} else if(options.saveAs) { {
+		} else if(options.saveAs) {
 			item.setSaveDialogOptions({defaultPath: filePath});
 		}
 
