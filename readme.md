@@ -141,11 +141,40 @@ Optional callback that receives an object containing information about the progr
 }
 ```
 
+#### onTotalProgress
+
+Type: `Function`
+
+Optional callback that receives an object containing information about the total progress of all download items.
+
+```js
+{
+percent: 0.1,
+transferredBytes: 100,
+totalBytes: 1000
+}
+```
+
 #### onCancel
 
 Type: `Function`
 
 Optional callback that receives the [download item](https://electronjs.org/docs/api/download-item) for which the download has been cancelled.
+
+#### onCompleted
+
+Type: `Function`
+
+Optional callback that receives an object containing information about the completed download file.
+
+```js
+{
+fileName: 'file.zip',
+path: '/path/file.zip',
+fileSize: 503320,
+mimeType: 'application/zip',
+url: 'https://example.com/file.zip'
+}
 
 #### openFolderWhenDone
 

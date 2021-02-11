@@ -6,6 +6,14 @@ declare namespace electronDl {
 		transferredBytes: number;
 		totalBytes: number;
 	}
+	
+	interface Completed {
+		fileName: string,
+		path: string,
+		fileSize: number,
+		mimeType: string,
+		url: string
+	}
 
 	interface Options {
 		/**
@@ -60,11 +68,21 @@ declare namespace electronDl {
 		Optional callback that receives an object containing information about the progress of the current download item.
 		*/
 		readonly onProgress?: (progress: Progress) => void;
+		
+		/**
+		Optional callback that receives an object containing information about the total progress of all download items.
+		*/
+		readonly onTotalProgress?: (progress: Progress) => void;
 
 		/**
 		Optional callback that receives the [download item](https://electronjs.org/docs/api/download-item) for which the download has been cancelled.
 		*/
 		readonly onCancel?: (item: DownloadItem) => void;
+		
+		/**
+		Optional callback that receives an object containing information about the completed download file.
+		*/
+		readonly onCompleted?: (completed: Completed) => void;
 
 		/**
 		Reveal the downloaded file in the system file manager, and if possible, select the file.

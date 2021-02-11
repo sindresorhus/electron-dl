@@ -83,6 +83,14 @@ function registerListener(session, options, callback = () => {}) {
 					totalBytes: itemTotalBytes
 				});
 			}
+
+			if (typeof options.onTotalProgress === 'function') {
+				options.onTotalProgress({
+					percent: progressDownloadItems(),
+					transferredBytes: receivedBytes,
+					totalBytes
+				});
+			}
 		});
 
 		item.on('done', (event, state) => {
@@ -118,6 +126,16 @@ function registerListener(session, options, callback = () => {}) {
 
 				if (options.openFolderWhenDone) {
 					shell.showItemInFolder(filePath);
+				}
+
+				if (typeof options.onCompleted === 'function') {
+					options.onCompleted({
+						fileName: item.getFilename(),
+						path: item.getSavePath(),
+						fileSize: item.getReceivedBytes(),
+						mimeType: item.getMimeType(),
+						url: item.getURL()
+					});
 				}
 
 				callback(null, item);
