@@ -8,7 +8,7 @@ declare namespace electronDl {
 	}
 	
 	interface File {
-		fileName: string,
+		filename: string,
 		path: string,
 		fileSize: number,
 		mimeType: string,
