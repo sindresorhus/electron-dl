@@ -149,9 +149,9 @@ Optional callback that receives an object containing information about the total
 
 ```js
 {
-percent: 0.1,
-transferredBytes: 100,
-totalBytes: 1000
+	percent: 0.1,
+	transferredBytes: 100,
+	totalBytes: 1000
 }
 ```
 
@@ -169,11 +169,11 @@ Optional callback that receives an object containing information about the compl
 
 ```js
 {
-fileName: 'file.zip',
-path: '/path/file.zip',
-fileSize: 503320,
-mimeType: 'application/zip',
-url: 'https://example.com/file.zip'
+	filename: 'file.zip',
+	path: '/path/file.zip',
+	fileSize: 503320,
+	mimeType: 'application/zip',
+	url: 'https://example.com/file.zip'
 }
 
 #### openFolderWhenDone
