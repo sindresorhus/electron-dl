@@ -7,7 +7,7 @@ declare namespace electronDl {
 		totalBytes: number;
 	}
 	
-	interface Completed {
+	interface File {
 		fileName: string,
 		path: string,
 		fileSize: number,
