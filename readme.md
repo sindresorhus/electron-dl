@@ -145,7 +145,10 @@ Optional callback that receives an object containing information about the progr
 
 Type: `Function`
 
-Optional callback that receives an object containing information about the total progress of all download items.
+Optional callback that receives an object containing information about the combined progress of all download items done within any registered window.
+
+Each time a new download is started, the next callback will include it. The progress percentage would therefore become smaller again, for example.
+This callback provides the same data that is used for the progress bar on the app icon.
 
 ```js
 {
@@ -165,7 +168,7 @@ Optional callback that receives the [download item](https://electronjs.org/docs/
 
 Type: `Function`
 
-Optional callback that receives an object containing information about the completed download file.
+Optional callback that receives an object with information about an item that has been completed. It is called for each completed item.
 
 ```js
 {
