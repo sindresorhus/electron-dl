@@ -64,9 +64,9 @@ It can only be used in the [main](https://electronjs.org/docs/glossary/#main-pro
 
 ### window
 
-Type: `BrowserWindow` | `BrowserView`
+Type: `BrowserWindow | BrowserView`
 
-Window to register the behavior on. Alternatively a BrowserView can be passed along.
+Window to register the behavior on. Alternatively, a `BrowserView` can be passed.
 
 ### url
 
