@@ -1,4 +1,4 @@
-import {BrowserWindow, DownloadItem} from 'electron';
+import {BrowserView, BrowserWindow, DownloadItem} from 'electron';
 
 declare namespace electronDl {
 	interface Progress {
@@ -121,7 +121,7 @@ declare const electronDl: {
 	```
 	*/
 	download(
-		window: BrowserWindow,
+		window: BrowserWindow | BrowserView,
 		url: string,
 		options?: electronDl.Options
 	): Promise<DownloadItem>;
