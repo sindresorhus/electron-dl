@@ -30,7 +30,7 @@ const getWindowFromBrowserView = webContents => {
 	}
 };
 
-const getWindowFromWebcontents = webContents => {
+const getWindowFromWebContents = webContents => {
 	let window_;
 	const webContentsType = webContents.getType();
 	switch (webContentsType) {
@@ -38,12 +38,7 @@ const getWindowFromWebcontents = webContents => {
 			window_ = BrowserWindow.fromWebContents(webContents.hostWebContents);
 			break;
 		case 'browserView':
-			if (majorElectronVersion() < 12) {
-				window_ = getWindowFromBrowserView(webContents);
-			} else {
-				window_ = BrowserWindow.fromWebContents(webContents);
-			}
-
+			window_ = getWindowFromBrowserView(webContents);
 			break;
 		default:
 			window_ = BrowserWindow.fromWebContents(webContents);
@@ -70,7 +65,7 @@ function registerListener(session, options, callback = () => {}) {
 		downloadItems.add(item);
 		totalBytes += item.getTotalBytes();
 
-		const window_ = getWindowFromWebcontents(webContents);
+		const window_ = majorElectronVersion() >= 12 ? BrowserWindow.fromWebContents(webContents) : getWindowFromWebContents(webContents);
 
 		const directory = options.directory || app.getPath('downloads');
 		let filePath;
