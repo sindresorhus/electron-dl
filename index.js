@@ -15,6 +15,39 @@ const getFilenameFromMime = (name, mime) => {
 	return `${name}.${extensions[0].ext}`;
 };
 
+const majorElectronVersion = () => {
+	const version = process.versions.electron.split('.');
+	return parseInt(version[0], 10);
+};
+
+const getWindowFromBrowserView = webContents => {
+	for (const currentWindow of BrowserWindow.getAllWindows()) {
+		for (const currentBrowserView of currentWindow.getBrowserViews()) {
+			if (currentBrowserView.webContents.id === webContents.id) {
+				return currentWindow;
+			}
+		}
+	}
+};
+
+const getWindowFromWebContents = webContents => {
+	let window_;
+	const webContentsType = webContents.getType();
+	switch (webContentsType) {
+		case 'webview':
+			window_ = BrowserWindow.fromWebContents(webContents.hostWebContents);
+			break;
+		case 'browserView':
+			window_ = getWindowFromBrowserView(webContents);
+			break;
+		default:
+			window_ = BrowserWindow.fromWebContents(webContents);
+			break;
+	}
+
+	return window_;
+};
+
 function registerListener(session, options, callback = () => {}) {
 	const downloadItems = new Set();
 	let receivedBytes = 0;
@@ -32,12 +65,7 @@ function registerListener(session, options, callback = () => {}) {
 		downloadItems.add(item);
 		totalBytes += item.getTotalBytes();
 
-		let hostWebContents = webContents;
-		if (webContents.getType() === 'webview') {
-			({hostWebContents} = webContents);
-		}
-
-		const window_ = BrowserWindow.fromWebContents(hostWebContents);
+		const window_ = majorElectronVersion() >= 12 ? BrowserWindow.fromWebContents(webContents) : getWindowFromWebContents(webContents);
 
 		const directory = options.directory || app.getPath('downloads');
 		let filePath;
