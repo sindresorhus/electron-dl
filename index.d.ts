@@ -72,7 +72,7 @@ declare namespace electronDl {
 		/**
 		Optional callback that receives an object containing information about the combined progress of all download items done within any registered window.
 		
-		Each time a new download is started, the next callback will include it. The progress percentage would therefore become smaller again, for example.
+		Each time a new download is started, the next callback will include it. The progress percentage could therefore become smaller again.
 		This callback provides the same data that is used for the progress bar on the app icon.
 		*/
 		readonly onTotalProgress?: (file: File) => void;
