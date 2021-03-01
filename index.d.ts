@@ -85,7 +85,7 @@ declare namespace electronDl {
 		/**
 		Optional callback that receives an object with information about an item that has been completed. It is called for each completed item.
 		*/
-		readonly onCompleted?: (completed: Completed) => void;
+		readonly onCompleted?: (completed: { fileName: string; path: string; fileSize: number; mimeType: string; url: string }) => void;
 
 		/**
 		Reveal the downloaded file in the system file manager, and if possible, select the file.
