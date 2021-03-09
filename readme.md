@@ -180,6 +180,7 @@ Optional callback that receives an object with information about an item that ha
 	url: 'https://example.com/file.zip'
 }
 ```
+
 #### openFolderWhenDone
 
 Type: `boolean`\
