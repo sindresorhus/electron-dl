@@ -179,7 +179,7 @@ Optional callback that receives an object with information about an item that ha
 	mimeType: 'application/zip',
 	url: 'https://example.com/file.zip'
 }
-
+```
 #### openFolderWhenDone
 
 Type: `boolean`\
