@@ -75,7 +75,7 @@ declare namespace electronDl {
 		Each time a new download is started, the next callback will include it. The progress percentage could therefore become smaller again.
 		This callback provides the same data that is used for the progress bar on the app icon.
 		*/
-		readonly onTotalProgress?: (file: File) => void;
+		readonly onTotalProgress?: (progress: Progress) => void;
 
 		/**
 		Optional callback that receives the [download item](https://electronjs.org/docs/api/download-item) for which the download has been cancelled.
@@ -85,7 +85,7 @@ declare namespace electronDl {
 		/**
 		Optional callback that receives an object with information about an item that has been completed. It is called for each completed item.
 		*/
-		readonly onCompleted?: (completed: { fileName: string; path: string; fileSize: number; mimeType: string; url: string }) => void;
+		readonly onCompleted?: (file: File) => void;
 
 		/**
 		Reveal the downloaded file in the system file manager, and if possible, select the file.
