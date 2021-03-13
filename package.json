@@ -1,6 +1,6 @@
 {
 	"name": "electron-dl",
-	"version": "3.2.0",
+	"version": "3.2.1",
 	"description": "Simplified file downloads for your Electron app",
 	"license": "MIT",
 	"repository": "sindresorhus/electron-dl",
