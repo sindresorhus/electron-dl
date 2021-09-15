@@ -195,6 +195,14 @@ Default: `true`
 
 Shows the file count badge on macOS/Linux dock icons when download is in progress.
 
+#### overwrite
+
+Type: `boolean`\
+Default: `false`
+
+Allows downloaded files to overwrite files with the same name in the directory they are saved to.
+Otherwise, default behavior is to append a number to the file name.
+
 ## Development
 
 After making changes, run the automated tests:

@@ -100,13 +100,14 @@ declare namespace electronDl {
 		@default true
 		*/
 		readonly showBadge?: boolean;
-		
+
 		/**
 		Allows downloaded files to overwrite files with the same name in the directory they are saved to.
-		
+		Otherwise, default behavior is to append a number to the file name.
+
 		@default false
 		*/
-		readonly allowOverwrite?: boolean;
+		readonly overwrite?: boolean;
 	}
 }
 
@@ -130,7 +131,7 @@ declare const electronDl: {
 	*/
 	(options?: electronDl.Options): void;
 
-  	/**
+	/**
 	This can be useful if you need download functionality in a reusable module.
 
 	@param window - Window to register the behavior on.
