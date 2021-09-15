@@ -49,8 +49,7 @@ const {BrowserWindow, ipcMain} = require('electron');
 const {download} = require('electron-dl');
 
 ipcMain.on('download-button', async (event, {url}) => {
- 	const win = BrowserWindow.getFocusedWindow();
- 	console.log(await download(win, url));
+	console.log(await download(url));
 });
 ```
 
@@ -60,7 +59,7 @@ It can only be used in the [main](https://electronjs.org/docs/glossary/#main-pro
 
 ### electronDl(options?)
 
-### electronDl.download(window, url, options?): Promise<[DownloadItem](https://electronjs.org/docs/api/download-item)>
+### electronDl.download(url, options?): Promise<[DownloadItem](https://electronjs.org/docs/api/download-item)>
 
 ### window
 
