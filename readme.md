@@ -61,12 +61,6 @@ It can only be used in the [main](https://electronjs.org/docs/glossary/#main-pro
 
 ### electronDl.download(url, options?): Promise<[DownloadItem](https://electronjs.org/docs/api/download-item)>
 
-### window
-
-Type: `BrowserWindow | BrowserView`
-
-Window to register the behavior on. Alternatively, a `BrowserView` can be passed.
-
 ### url
 
 Type: `string`
