@@ -96,7 +96,7 @@ function registerListener(session, options, callback = () => {}) {
 			}
 
 			if (options.showBadge && ['darwin', 'linux'].includes(process.platform)) {
-				app.setBadgeCount(activeDownloadItems());
+				app.badgeCount = activeDownloadItems();
 			}
 
 			if (!window_.isDestroyed()) {
@@ -128,7 +128,7 @@ function registerListener(session, options, callback = () => {}) {
 			downloadItems.delete(item);
 
 			if (options.showBadge && ['darwin', 'linux'].includes(process.platform)) {
-				app.setBadgeCount(activeDownloadItems());
+				app.badgeCount = activeDownloadItems();
 			}
 
 			if (!window_.isDestroyed() && !activeDownloadItems()) {
