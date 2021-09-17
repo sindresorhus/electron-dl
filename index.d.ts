@@ -100,6 +100,15 @@ declare namespace electronDl {
 		@default true
 		*/
 		readonly showBadge?: boolean;
+
+		/**
+		Allow downloaded files to overwrite files with the same name in the directory they are saved to.
+
+		The default behavior is to append a number to the filename.
+
+		@default false
+		*/
+		readonly overwrite?: boolean;
 	}
 }
 
