@@ -29,8 +29,10 @@ test('download a single file', async t => {
 	const {client} = t.context.spectron;
 	await client.waitUntilWindowLoaded();
 	await client.url(`http://localhost:8080/index.html?files=${JSON.stringify(t.context.files)}`);
-	await client.waitForExist(`[data-unique-filename="${t.context.files[0]}"]`);
-	await client.click(`[data-unique-filename="${t.context.files[0]}"]`);
+
+	const file0 = await client.$(`[data-unique-filename="${t.context.files[0]}"]`);
+	await file0.waitForExist();
+	await file0.click();
 
 	t.is(await t.context.spectron.electron.remote.app.badgeCount, 1);
 });
@@ -39,10 +41,13 @@ test('download a couple files', async t => {
 	const {client} = t.context.spectron;
 	await client.waitUntilWindowLoaded();
 	await client.url(`http://localhost:8080/index.html?files=${JSON.stringify(t.context.files)}`);
-	await client.waitForExist(`[data-unique-filename="${t.context.files[1]}"]`);
-	await client.waitForExist(`[data-unique-filename="${t.context.files[2]}"]`);
-	await client.click(`[data-unique-filename="${t.context.files[1]}"]`);
-	await client.click(`[data-unique-filename="${t.context.files[2]}"]`);
+
+	const file1 = await client.$(`[data-unique-filename="${t.context.files[1]}"]`);
+	const file2 = await client.$(`[data-unique-filename="${t.context.files[2]}"]`);
+	await file1.waitForExist();
+	await file2.waitForExist();
+	await file1.click();
+	await file2.click();
 
 	// The first download appears to finish before the second is added sometimes
 	const badgeCount = await t.context.spectron.electron.remote.app.badgeCount;
