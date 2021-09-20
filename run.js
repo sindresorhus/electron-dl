@@ -16,6 +16,7 @@ const argv = minimist(process.argv.slice(2));
 
 	const win = new electron.BrowserWindow({
 		webPreferences: {
+			enableRemoteModule: true,
 			nodeIntegration: true
 		}
 	});
