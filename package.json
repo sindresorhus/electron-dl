@@ -33,9 +33,10 @@
 	},
 	"devDependencies": {
 		"@types/node": "^13.1.4",
-		"ava": "^2.4.0",
+		"ava": "^3.15.0",
 		"cp-file": "^7.0.0",
 		"electron": "^11.0.0",
+		"esm": "^3.2.25",
 		"minimist": "^1.2.0",
 		"node-static": "^0.7.11",
 		"pify": "^4.0.1",
@@ -43,6 +44,11 @@
 		"tsd": "^0.17.0",
 		"uuid": "^3.3.2",
 		"xo": "^0.25.3"
+	},
+	"ava": {
+		"require": [
+			"esm"
+		]
 	},
 	"xo": {
 		"envs": [
