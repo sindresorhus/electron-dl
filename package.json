@@ -46,6 +46,7 @@
 		"xo": "^0.25.3"
 	},
 	"ava": {
+		"timeout": "5m",
 		"require": [
 			"esm"
 		]
