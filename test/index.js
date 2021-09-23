@@ -31,7 +31,7 @@ test('download a single file', async t => {
 	await client.url(`http://localhost:8080/index.html?files=${JSON.stringify(t.context.files)}`);
 
 	const file0 = await client.$(`[data-unique-filename="${t.context.files[0]}"]`);
-	await file0.waitForExist();
+	await file0.waitForClickable();
 	await file0.click();
 
 	t.is(await t.context.spectron.electron.remote.app.getBadgeCount(), 1);
@@ -44,8 +44,8 @@ test('download a couple files', async t => {
 
 	const file1 = await client.$(`[data-unique-filename="${t.context.files[1]}"]`);
 	const file2 = await client.$(`[data-unique-filename="${t.context.files[2]}"]`);
-	await file1.waitForExist();
-	await file2.waitForExist();
+	await file1.waitForClickable();
+	await file2.waitForClickable();
 	await file1.click();
 	await file2.click();
 
