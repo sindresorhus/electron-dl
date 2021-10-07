@@ -1,8 +1,8 @@
 'use strict';
 const electron = require('electron');
 const minimist = require('minimist');
-const samples = require('./lib/samples');
-const server = require('./lib/server');
+const samples = require('./lib/samples.js');
+const server = require('./lib/server.js');
 const electronDl = require('.');
 
 electronDl();
@@ -27,8 +27,8 @@ const argv = minimist(process.argv.slice(2));
 		downloadThroughput: 1024 * 1024
 	});
 
-	const numSampleFiles = 'files' in argv ? argv.files : 5;
-	const files = await samples.setup(numSampleFiles);
+	const numberSampleFiles = 'files' in argv ? argv.files : 5;
+	const files = await samples.setup(numberSampleFiles);
 	await win.loadURL(`http://localhost:8080/index.html?files=${JSON.stringify(files)}`);
 })();
 
