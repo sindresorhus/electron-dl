@@ -17,7 +17,7 @@ const getFilenameFromMime = (name, mime) => {
 
 const majorElectronVersion = () => {
 	const version = process.versions.electron.split('.');
-	return parseInt(version[0], 10);
+	return Number.parseInt(version[0], 10);
 };
 
 const getWindowFromBrowserView = webContents => {
@@ -75,11 +75,7 @@ function registerListener(session, options, callback = () => {}) {
 			const filename = item.getFilename();
 			const name = path.extname(filename) ? filename : getFilenameFromMime(filename, item.getMimeType());
 
-			if (options.overwrite) {
-				filePath = path.join(directory, name);
-			} else {
-				filePath = unusedFilename.sync(path.join(directory, name));
-			}
+			filePath = options.overwrite ? path.join(directory, name) : unusedFilename.sync(path.join(directory, name));
 		}
 
 		const errorMessage = options.errorMessage || 'The download of {filename} was interrupted';
@@ -147,6 +143,7 @@ function registerListener(session, options, callback = () => {}) {
 				session.removeListener('will-download', listener);
 			}
 
+			// eslint-disable-next-line unicorn/prefer-switch
 			if (state === 'cancelled') {
 				if (typeof options.onCancel === 'function') {
 					options.onCancel(item);
