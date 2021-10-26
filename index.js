@@ -67,7 +67,11 @@ function registerListener(session, options, callback = () => {}) {
 
 		const window_ = majorElectronVersion() >= 12 ? BrowserWindow.fromWebContents(webContents) : getWindowFromWebContents(webContents);
 
-		const directory = options.directory || app.getPath('downloads');
+		let directory = options.directory || app.getPath('downloads');
+		if (directory.match(/^\./)) {
+			// relative path, so join to AppPath
+			directory = path.join(app.getAppPath(), directory);
+		}
 		let filePath;
 		if (options.filename) {
 			filePath = path.join(directory, options.filename);
