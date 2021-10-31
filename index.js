@@ -1,6 +1,6 @@
 'use strict';
 const path = require('path');
-const {app, BrowserWindow, shell, dialog} = require('electron');
+const { app, BrowserWindow, shell, dialog } = require('electron');
 const unusedFilename = require('unused-filename');
 const pupa = require('pupa');
 const extName = require('ext-name');
@@ -15,57 +15,51 @@ const getFilenameFromMime = (name, mime) => {
 	return `${name}.${extensions[0].ext}`;
 };
 
-const majorElectronVersion = () => {
-	const version = process.versions.electron.split('.');
-	return Number.parseInt(version[0], 10);
-};
+const downloadItems = new Map();
 
-const getWindowFromBrowserView = webContents => {
-	for (const currentWindow of BrowserWindow.getAllWindows()) {
-		for (const currentBrowserView of currentWindow.getBrowserViews()) {
-			if (currentBrowserView.webContents.id === webContents.id) {
-				return currentWindow;
-			}
-		}
-	}
-};
-
-const getWindowFromWebContents = webContents => {
-	let window_;
-	const webContentsType = webContents.getType();
-	switch (webContentsType) {
-		case 'webview':
-			window_ = BrowserWindow.fromWebContents(webContents.hostWebContents);
-			break;
-		case 'browserView':
-			window_ = getWindowFromBrowserView(webContents);
-			break;
-		default:
-			window_ = BrowserWindow.fromWebContents(webContents);
-			break;
-	}
-
-	return window_;
-};
+const activeDownloadItems = () => downloadItems.size;
 
 function registerListener(session, options, callback = () => {}) {
-	const downloadItems = new Set();
-	let receivedBytes = 0;
-	let completedBytes = 0;
-	let totalBytes = 0;
-	const activeDownloadItems = () => downloadItems.size;
-	const progressDownloadItems = () => receivedBytes / totalBytes;
+	const progressDownloadItems = () => {
+		const bytes = [...downloadItems].reduce(
+			({ totalBytes, receivedBytes }, file) => {
+				const [, { item }] = file;
+				totalBytes += item.getTotalBytes();
+				receivedBytes += item.getReceivedBytes();
+				return {
+					totalBytes,
+					receivedBytes
+				};
+			}, { totalBytes: 0, receivedBytes: 0 }
+		);
 
-	options = {
-		showBadge: true,
-		...options
+		return bytes.receivedBytes / bytes.totalBytes;
 	};
 
 	const listener = (event, item, webContents) => {
-		downloadItems.add(item);
-		totalBytes += item.getTotalBytes();
+		// For some reason the 'will-download' event is triggered
+		// more than once for certain items when downloading multiple files,
+		// so this makes sure the item is "replace" with the last item,
+		// this become useful on 'updated' event.
+		if (downloadItems.has(item.getFilename())) {
+			downloadItems.delete(item.getFilename());
+		}
 
-		const window_ = majorElectronVersion() >= 12 ? BrowserWindow.fromWebContents(webContents) : getWindowFromWebContents(webContents);
+		// Setting the item with it's options for future references.
+		// This avoids this bug found in electro-dl (https://github.com/sindresorhus/electron-dl/issues/83)
+		// which reports the wrong progress when downloading multiple items
+		// on item's 'updated' event.
+		downloadItems.set(item.getFilename(), {
+			options,
+			item
+		});
+
+		let hostWebContents = webContents;
+		if (webContents.getType() === 'webview') {
+			({ hostWebContents } = webContents);
+		}
+
+		const window_ = BrowserWindow.fromWebContents(hostWebContents);
 
 		const directory = options.directory || app.getPath('downloads');
 		let filePath;
@@ -74,15 +68,13 @@ function registerListener(session, options, callback = () => {}) {
 		} else {
 			const filename = item.getFilename();
 			const name = path.extname(filename) ? filename : getFilenameFromMime(filename, item.getMimeType());
-
-			filePath = options.overwrite ? path.join(directory, name) : unusedFilename.sync(path.join(directory, name));
+			filePath = unusedFilename.sync(path.join(directory, name));
 		}
 
 		const errorMessage = options.errorMessage || 'The download of {filename} was interrupted';
+		const errorTitle = options.errorTitle || 'Download Error';
 
-		if (options.saveAs) {
-			item.setSaveDialogOptions({defaultPath: filePath});
-		} else {
+		if (!options.saveAs) {
 			item.setSavePath(filePath);
 		}
 
@@ -90,66 +82,60 @@ function registerListener(session, options, callback = () => {}) {
 			options.onStarted(item);
 		}
 
-		item.on('updated', () => {
-			receivedBytes = completedBytes;
-			for (const item of downloadItems) {
-				receivedBytes += item.getReceivedBytes();
-			}
+		item.on('updated', (event, state) => {
+			const { options } = downloadItems.get(item.getFilename());
 
-			if (options.showBadge && ['darwin', 'linux'].includes(process.platform)) {
-				app.badgeCount = activeDownloadItems();
-			}
+			if (state === 'progressing') {
+				if (options.showBadge && ['darwin', 'linux'].includes(process.platform)) {
+					app.badgeCount = activeDownloadItems();
+				}
 
-			if (!window_.isDestroyed()) {
-				window_.setProgressBar(progressDownloadItems());
-			}
+				if (!window_.isDestroyed()) {
+					window_.setProgressBar(progressDownloadItems());
+				}
 
-			if (typeof options.onProgress === 'function') {
-				const itemTransferredBytes = item.getReceivedBytes();
-				const itemTotalBytes = item.getTotalBytes();
-
-				options.onProgress({
-					percent: itemTotalBytes ? itemTransferredBytes / itemTotalBytes : 0,
-					transferredBytes: itemTransferredBytes,
-					totalBytes: itemTotalBytes
-				});
-			}
-
-			if (typeof options.onTotalProgress === 'function') {
-				options.onTotalProgress({
-					percent: progressDownloadItems(),
-					transferredBytes: receivedBytes,
-					totalBytes
-				});
+				if (typeof options.onProgress === 'function') {
+					options.onProgress({
+						percent: item.getTotalBytes() ? item.getReceivedBytes() / item.getTotalBytes() : 0,
+						transferredBytes: item.getReceivedBytes(),
+						totalBytes: item.getTotalBytes()
+					});
+				}
+			} else if (state === 'interrupted') {
+				// ---- NOT FULLY IMPLEMENTED ---
+				// The download has interrupted and can be resumed.
+				// Read: https://www.electronjs.org/docs/api/download-item#downloaditemresume
+				callback(null, item);
 			}
 		});
 
 		item.on('done', (event, state) => {
-			completedBytes += item.getTotalBytes();
-			downloadItems.delete(item);
+			downloadItems.delete(item.getFilename());
 
+			// Apparently this only works on Mac and Linux/Unity.
+			// The only problem is that Unity is no more
+			// so in Linux/Gnome for example, app.badgeCount is always equal to zero "0"
 			if (options.showBadge && ['darwin', 'linux'].includes(process.platform)) {
 				app.badgeCount = activeDownloadItems();
 			}
 
 			if (!window_.isDestroyed() && !activeDownloadItems()) {
 				window_.setProgressBar(-1);
-				receivedBytes = 0;
-				completedBytes = 0;
-				totalBytes = 0;
 			}
 
 			if (options.unregisterWhenDone) {
 				session.removeListener('will-download', listener);
 			}
 
-			// eslint-disable-next-line unicorn/prefer-switch
 			if (state === 'cancelled') {
 				if (typeof options.onCancel === 'function') {
 					options.onCancel(item);
 				}
 			} else if (state === 'interrupted') {
-				const message = pupa(errorMessage, {filename: path.basename(filePath)});
+				const message = pupa(errorMessage, {
+					filename: item.getFilename()
+				});
+				dialog.showErrorBox(errorTitle, message);
 				callback(new Error(message));
 			} else if (state === 'completed') {
 				if (process.platform === 'darwin') {
@@ -157,17 +143,7 @@ function registerListener(session, options, callback = () => {}) {
 				}
 
 				if (options.openFolderWhenDone) {
-					shell.showItemInFolder(filePath);
-				}
-
-				if (typeof options.onCompleted === 'function') {
-					options.onCompleted({
-						fileName: item.getFilename(),
-						path: item.getSavePath(),
-						fileSize: item.getReceivedBytes(),
-						mimeType: item.getMimeType(),
-						url: item.getURL()
-					});
+					shell.showItemInFolder(path.join(directory, item.getFilename()));
 				}
 
 				callback(null, item);
@@ -180,28 +156,27 @@ function registerListener(session, options, callback = () => {}) {
 
 module.exports = (options = {}) => {
 	app.on('session-created', session => {
-		registerListener(session, options, (error, _) => {
-			if (error) {
-				const errorTitle = options.errorTitle || 'Download Error';
-				dialog.showErrorBox(errorTitle, error.message);
-			}
-		});
+		registerListener(session, options);
 	});
 };
 
-module.exports.download = (window_, url, options) => new Promise((resolve, reject) => {
-	options = {
-		...options,
-		unregisterWhenDone: true
-	};
+module.exports.activeDownloadItems = activeDownloadItems;
 
-	registerListener(window_.webContents.session, options, (error, item) => {
-		if (error) {
-			reject(error);
-		} else {
-			resolve(item);
-		}
+module.exports.download = (window_, url, options) =>
+	new Promise((resolve, reject) => {
+		options = {
+			showBadge: true,
+			...options,
+			unregisterWhenDone: true
+		};
+
+		registerListener(window_.webContents.session, options, (error, item) => {
+			if (error) {
+				reject(error);
+			} else {
+				resolve(item);
+			}
+		});
+
+		window_.webContents.downloadURL(url);
 	});
-
-	window_.webContents.downloadURL(url);
-});
