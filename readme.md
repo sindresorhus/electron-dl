@@ -92,7 +92,9 @@ Note: Only use this option when strictly necessary. Downloading directly without
 Type: `string`\
 Default: [User's downloads directory](https://electronjs.org/docs/api/app/#appgetpathname)
 
-Directory to save the file in.
+The directory to save the file in.
+
+Must be an absolute path.
 
 #### filename
 

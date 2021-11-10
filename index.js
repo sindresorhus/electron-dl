@@ -67,7 +67,12 @@ function registerListener(session, options, callback = () => {}) {
 
 		const window_ = majorElectronVersion() >= 12 ? BrowserWindow.fromWebContents(webContents) : getWindowFromWebContents(webContents);
 
+		if (options.directory && !path.isAbsolute(options.directory)) {
+			throw new Error('The `directory` option must be an absolute path');
+		}
+
 		const directory = options.directory || app.getPath('downloads');
+
 		let filePath;
 		if (options.filename) {
 			filePath = path.join(directory, options.filename);

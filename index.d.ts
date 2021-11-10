@@ -26,7 +26,9 @@ declare namespace electronDl {
 		readonly saveAs?: boolean;
 
 		/**
-		Directory to save the file in.
+		The directory to save the file in.
+
+		Must be an absolute path.
 
 		Default: [User's downloads directory](https://electronjs.org/docs/api/app/#appgetpathname)
 		*/
