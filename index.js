@@ -161,14 +161,17 @@ function registerListener(session, options, callback = () => {}) {
 					app.dock.downloadFinished(filePath);
 				}
 
+			
+				const savePath = item.getSavePath();
+
 				if (options.openFolderWhenDone) {
-					shell.showItemInFolder(filePath);
+					shell.showItemInFolder(savePath);
 				}
 
 				if (typeof options.onCompleted === 'function') {
 					options.onCompleted({
 						fileName: item.getFilename(),
-						path: item.getSavePath(),
+						path: savePath,
 						fileSize: item.getReceivedBytes(),
 						mimeType: item.getMimeType(),
 						url: item.getURL()
