@@ -157,12 +157,11 @@ function registerListener(session, options, callback = () => {}) {
 				const message = pupa(errorMessage, {filename: path.basename(filePath)});
 				callback(new Error(message));
 			} else if (state === 'completed') {
-				if (process.platform === 'darwin') {
-					app.dock.downloadFinished(filePath);
-				}
-
-			
 				const savePath = item.getSavePath();
+
+				if (process.platform === 'darwin') {
+					app.dock.downloadFinished(savePath);
+				}
 
 				if (options.openFolderWhenDone) {
 					shell.showItemInFolder(savePath);
