@@ -111,6 +111,13 @@ declare namespace electronDl {
 		@default false
 		*/
 		readonly overwrite?: boolean;
+
+		/**
+		Save dialog options used to personalize the dialog.
+
+		@defalt {}
+		 */
+		readonly dialogOptions?: any;
 	}
 }
 
