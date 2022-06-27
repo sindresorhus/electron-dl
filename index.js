@@ -91,7 +91,7 @@ function registerListener(session, options, callback = () => {}) {
 				saveOptions.defaultPath = filePath;
 			}
 
-			item.setSaveDialogOptions({defaultPath: filePath});
+			item.setSaveDialogOptions(saveOptions);
 		} else {
 			item.setSavePath(filePath);
 		}
