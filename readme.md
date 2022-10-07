@@ -197,6 +197,13 @@ Default: `true`
 
 Shows the file count badge on macOS/Linux dock icons when download is in progress.
 
+#### showProgressBar
+
+Type: `boolean`\
+Default: `true`
+
+Shows the progress bar when download is in progress.
+
 #### overwrite
 
 Type: `boolean`\

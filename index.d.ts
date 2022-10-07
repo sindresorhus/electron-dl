@@ -104,6 +104,13 @@ declare namespace electronDl {
 		readonly showBadge?: boolean;
 
 		/**
+		Shows the progress bar when download is in progress.
+
+		@default true
+		*/
+		readonly showProgressBar?: boolean;
+
+		/**
 		Allow downloaded files to overwrite files with the same name in the directory they are saved to.
 
 		The default behavior is to append a number to the filename.
