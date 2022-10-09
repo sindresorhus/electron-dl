@@ -58,6 +58,7 @@ function registerListener(session, options, callback = () => {}) {
 
 	options = {
 		showBadge: true,
+		showProgressBar: true,
 		...options
 	};
 
@@ -105,7 +106,7 @@ function registerListener(session, options, callback = () => {}) {
 				app.badgeCount = activeDownloadItems();
 			}
 
-			if (!window_.isDestroyed()) {
+			if (!window_.isDestroyed() && options.showProgressBar) {
 				window_.setProgressBar(progressDownloadItems());
 			}
 
