@@ -97,14 +97,14 @@ declare namespace electronDl {
 		readonly openFolderWhenDone?: boolean;
 
 		/**
-		Shows the file count badge on macOS/Linux dock icons when download is in progress.
+		Show a file count badge on the macOS/Linux dock/taskbar icon when a download is in progress.
 
 		@default true
 		*/
 		readonly showBadge?: boolean;
 
 		/**
-		Shows the progress bar when download is in progress.
+		Show a progress bar on the dock/taskbar icon when a download is in progress.
 
 		@default true
 		*/
