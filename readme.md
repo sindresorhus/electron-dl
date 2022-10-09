@@ -195,14 +195,14 @@ Reveal the downloaded file in the system file manager, and if possible, select t
 Type: `boolean`\
 Default: `true`
 
-Shows the file count badge on macOS/Linux dock icons when download is in progress.
+Show a file count badge on the macOS/Linux dock/taskbar icon when a download is in progress.
 
 #### showProgressBar
 
 Type: `boolean`\
 Default: `true`
 
-Shows the progress bar when download is in progress.
+Show a progress bar on the dock/taskbar icon when a download is in progress.
 
 #### overwrite
 
