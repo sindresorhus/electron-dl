@@ -170,7 +170,7 @@ function registerListener(session, options, callback = () => {}) {
 
 				if (typeof options.onCompleted === 'function') {
 					options.onCompleted({
-						fileName: item.getFilename(),
+						filename: item.getFilename(),
 						path: savePath,
 						fileSize: item.getReceivedBytes(),
 						mimeType: item.getMimeType(),
