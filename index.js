@@ -170,6 +170,7 @@ function registerListener(session, options, callback = () => {}) {
 
 				if (typeof options.onCompleted === 'function') {
 					options.onCompleted({
+						fileName: item.getFilename(), // Just for backwards compatibility. TODO: Remove in the next major version.
 						filename: item.getFilename(),
 						path: savePath,
 						fileSize: item.getReceivedBytes(),
