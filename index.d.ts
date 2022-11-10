@@ -120,9 +120,9 @@ declare namespace electronDl {
 		readonly overwrite?: boolean;
 
 		/**
-		Save dialog options used to personalize the dialog. If `defaultPath` is not explicity defined, a default value is assigned based on the file path.
+		Customize the save dialog.
 
-		See [`options` parameter](https://www.electronjs.org/docs/latest/api/download-item#downloaditemsetsavedialogoptionsoptions) for properties.
+		If `defaultPath` is not explicity defined, a default value is assigned based on the file path.
 
 		@default {}
 		*/
