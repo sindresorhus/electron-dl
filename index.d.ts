@@ -1,4 +1,4 @@
-import {BrowserView, BrowserWindow, DownloadItem} from 'electron';
+import {BrowserView, BrowserWindow, DownloadItem, SaveDialogOptions} from 'electron';
 
 declare namespace electronDl {
 	interface Progress {
@@ -118,6 +118,15 @@ declare namespace electronDl {
 		@default false
 		*/
 		readonly overwrite?: boolean;
+
+		/**
+		Customize the save dialog.
+
+		If `defaultPath` is not explicity defined, a default value is assigned based on the file path.
+
+		@default {}
+		*/
+		readonly dialogOptions?: SaveDialogOptions;
 	}
 }
 
