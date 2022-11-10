@@ -1,4 +1,4 @@
-import {BrowserView, BrowserWindow, DownloadItem} from 'electron';
+import {BrowserView, BrowserWindow, DownloadItem, SaveDialogOptions} from 'electron';
 
 declare namespace electronDl {
 	interface Progress {
@@ -115,9 +115,11 @@ declare namespace electronDl {
 		/**
 		Save dialog options used to personalize the dialog.
 
+    See [`options` parameter](https://www.electronjs.org/docs/latest/api/download-item#downloaditemsetsavedialogoptionsoptions) for properties.
+
 		@defalt {}
 		 */
-		readonly dialogOptions?: any;
+		readonly dialogOptions?: SaveDialogOptions;
 	}
 }
 
