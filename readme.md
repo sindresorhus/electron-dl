@@ -213,6 +213,15 @@ Allow downloaded files to overwrite files with the same name in the directory th
 
 The default behavior is to append a number to the filename.
 
+#### dialogOptions
+
+Type: `SaveDialogOptions`\
+Default: `{}`
+
+Save dialog options used to personalize the dialog.
+
+See [`options` parameter](https://www.electronjs.org/docs/latest/api/download-item#downloaditemsetsavedialogoptionsoptions) for properties.
+
 ## Development
 
 After making changes, run the automated tests:
