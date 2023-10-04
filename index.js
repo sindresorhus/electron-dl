@@ -181,11 +181,11 @@ function registerListener(session, options, callback = () => {}) {
 				callback(null, item);
 			}
 		});
-	};
 
-	if (typeof options.onStarted === 'function') {
-		options.onStarted(item);
-	}
+		if (typeof options.onStarted === 'function') {
+			options.onStarted(item);
+		}
+	};
 
 	session.on('will-download', listener);
 }
@@ -217,3 +217,5 @@ module.exports.download = (window_, url, options) => new Promise((resolve, rejec
 
 	window_.webContents.downloadURL(url);
 });
+
+module.exports.CancelError = CancelError

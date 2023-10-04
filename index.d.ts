@@ -130,8 +130,18 @@ declare namespace electronDl {
 	}
 }
 
+/**
+ * Error thrown if `item.cancel()` was called.
+*/
+declare class CancelError extends Error {}
+
 // eslint-disable-next-line no-redeclare
 declare const electronDl: {
+	/**
+	 * The error thrown when the user cancels the download item.
+	*/
+	CancelError: typeof CancelError;
+
 	/**
 	Register the helper for all windows.
 
@@ -157,6 +167,8 @@ declare const electronDl: {
 	@param window - Window to register the behavior on.
 	@param url - URL to download.
 	@returns A promise for the downloaded file.
+	@throws {CancelError} An error if the user calls item.cancel().
+	@throws {Error} An error if the download fails.
 
 	@example
 	```
