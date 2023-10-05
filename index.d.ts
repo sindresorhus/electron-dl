@@ -167,7 +167,7 @@ declare const electronDl: {
 	@param window - Window to register the behavior on.
 	@param url - URL to download.
 	@returns A promise for the downloaded file.
-	@throws {CancelError} An error if the user calls item.cancel().
+	@throws {CancelError} An error if the user calls `item.cancel()`.
 	@throws {Error} An error if the download fails.
 
 	@example
