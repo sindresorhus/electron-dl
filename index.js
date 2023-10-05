@@ -5,6 +5,8 @@ const unusedFilename = require('unused-filename');
 const pupa = require('pupa');
 const extName = require('ext-name');
 
+class CancelError extends Error {}
+
 const getFilenameFromMime = (name, mime) => {
 	const extensions = extName.mime(mime);
 
@@ -92,10 +94,6 @@ function registerListener(session, options, callback = () => {}) {
 			item.setSavePath(filePath);
 		}
 
-		if (typeof options.onStarted === 'function') {
-			options.onStarted(item);
-		}
-
 		item.on('updated', () => {
 			receivedBytes = completedBytes;
 			for (const item of downloadItems) {
@@ -154,6 +152,7 @@ function registerListener(session, options, callback = () => {}) {
 				if (typeof options.onCancel === 'function') {
 					options.onCancel(item);
 				}
+				callback(new CancelError());
 			} else if (state === 'interrupted') {
 				const message = pupa(errorMessage, {filename: path.basename(filePath)});
 				callback(new Error(message));
@@ -182,6 +181,10 @@ function registerListener(session, options, callback = () => {}) {
 				callback(null, item);
 			}
 		});
+
+		if (typeof options.onStarted === 'function') {
+			options.onStarted(item);
+		}
 	};
 
 	session.on('will-download', listener);
@@ -214,3 +217,5 @@ module.exports.download = (window_, url, options) => new Promise((resolve, rejec
 
 	window_.webContents.downloadURL(url);
 });
+
+module.exports.CancelError = CancelError;
