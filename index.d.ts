@@ -131,14 +131,14 @@ declare namespace electronDl {
 }
 
 /**
- * Error thrown if `item.cancel()` was called.
+Error thrown if `item.cancel()` was called.
 */
 declare class CancelError extends Error {}
 
 // eslint-disable-next-line no-redeclare
 declare const electronDl: {
 	/**
-	 * The error thrown when the user cancels the download item.
+	Error thrown if `item.cancel()` was called.
 	*/
 	CancelError: typeof CancelError;
 
