@@ -10,6 +10,9 @@
 		"email": "sindresorhus@gmail.com",
 		"url": "sindresorhus.com"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"scripts": {
 		"start": "electron run.js",
 		"test": "xo && ava && tsd"
