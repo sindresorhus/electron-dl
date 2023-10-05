@@ -136,7 +136,7 @@ Note: Error dialog will not be shown in `electronDl.download()`. Please handle e
 Type: `Function`
 
 Optional callback that receives the [download item](https://electronjs.org/docs/api/download-item).
-You can use this for advanced handling such as canceling the item like `item.cancel()` which will throw `electronDl.CancelError` from `electronDl.download()` method.
+You can use this for advanced handling such as canceling the item like `item.cancel()` which will throw `electronDl.CancelError` from the `electronDl.download()` method.
 
 #### onProgress
 
