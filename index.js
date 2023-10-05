@@ -218,4 +218,4 @@ module.exports.download = (window_, url, options) => new Promise((resolve, rejec
 	window_.webContents.downloadURL(url);
 });
 
-module.exports.CancelError = CancelError
+module.exports.CancelError = CancelError;
