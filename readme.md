@@ -15,8 +15,8 @@
 
 ## Install
 
-```
-$ npm install electron-dl
+```sh
+npm install electron-dl
 ```
 
 Requires Electron 7 or later.
