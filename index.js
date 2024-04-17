@@ -195,7 +195,11 @@ module.exports = (options = {}) => {
 		registerListener(session, options, (error, _) => {
 			if (error && !(error instanceof CancelError)) {
 				const errorTitle = options.errorTitle || 'Download Error';
-				dialog.showErrorBox(errorTitle, error.message);
+				if ('onError' in options && typeof options.onError === 'function') {
+					options.onError(errorTitle, error.message);
+				} else {
+					dialog.showErrorBox(errorTitle, error.message);
+				}
 			}
 		});
 	});
