@@ -90,6 +90,12 @@ declare namespace electronDl {
 		readonly onCompleted?: (file: File) => void;
 
 		/**
+		Optional callback that receives an error title and an error message. It is called every time when download state is "interrupted".
+		If callback is not provided error will be shown in Electron error dialog.
+		*/
+		readonly onError?: (errorTitle: string, errorMessage: string) => void;
+
+		/**
 		Reveal the downloaded file in the system file manager, and if possible, select the file.
 
 		@default false
