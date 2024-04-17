@@ -197,6 +197,7 @@ Type: `Function`
 
 Optional callback that receives an error title and an error message. It is called every time when download state is "interrupted".
 If callback is not provided error will be shown in Electron error dialog.
+(*is applied only in default exported function, not for usage inside 'download' function)
 
 #### openFolderWhenDone
 
