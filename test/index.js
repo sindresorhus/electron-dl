@@ -1,17 +1,19 @@
-'use strict';
-import fs from 'fs';
-import path from 'path';
-import {serial as test} from 'ava';
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import test from 'ava';
 import pify from 'pify';
 import {Application} from 'spectron';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 test.beforeEach(async t => {
 	t.context.spectron = new Application({
 		path: 'node_modules/.bin/electron',
 		args: [
 			'run.js',
-			'--files=3'
-		]
+			'--files=3',
+		],
 	});
 	await t.context.spectron.start();
 });

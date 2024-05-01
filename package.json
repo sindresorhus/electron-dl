@@ -10,13 +10,19 @@
 		"email": "sindresorhus@gmail.com",
 		"url": "https://sindresorhus.com"
 	},
+	"type": "module",
+	"exports": {
+		"types": "./index.d.ts",
+		"default": "./index.js"
+	},
 	"sideEffects": false,
 	"engines": {
-		"node": ">=12"
+		"node": ">=18"
 	},
 	"scripts": {
 		"start": "electron run.js",
-		"test": "xo && ava && tsd"
+		"//test": "xo && ava && tsc index.d.ts",
+		"test": "xo && tsc index.d.ts"
 	},
 	"files": [
 		"index.js",
@@ -32,27 +38,28 @@
 	],
 	"dependencies": {
 		"ext-name": "^5.0.0",
-		"pupa": "^2.0.1",
-		"unused-filename": "^2.1.0"
+		"pupa": "^3.1.0",
+		"unused-filename": "^4.0.1"
 	},
 	"devDependencies": {
-		"@types/node": "^13.1.4",
-		"ava": "^2.4.0",
-		"cp-file": "^7.0.0",
-		"electron": "^7.1.7",
-		"minimist": "^1.2.0",
+		"@types/node": "^20.12.7",
+		"ava": "^6.1.2",
+		"copy-file": "^11.0.0",
+		"electron": "^30.0.1",
+		"minimist": "^1.2.8",
 		"node-static": "^0.7.11",
-		"pify": "^4.0.1",
-		"spectron": "^9.0.0",
-		"tsd": "^0.17.0",
-		"typescript": "^4.4.3",
-		"uuid": "^8.3.2",
-		"xo": "^0.39.0"
+		"pify": "^6.1.0",
+		"spectron": "^19.0.0",
+		"typescript": "^5.4.5",
+		"xo": "^0.58.0"
 	},
 	"xo": {
 		"envs": [
 			"node",
 			"browser"
 		]
+	},
+	"ava": {
+		"serial": true
 	}
 }

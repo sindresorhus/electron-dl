@@ -1,11 +1,16 @@
-'use strict';
-const path = require('path');
-const {app, BrowserWindow, shell, dialog} = require('electron');
-const unusedFilename = require('unused-filename');
-const pupa = require('pupa');
-const extName = require('ext-name');
+import process from 'node:process';
+import path from 'node:path';
+import {
+	app,
+	BrowserWindow,
+	shell,
+	dialog,
+} from 'electron';
+import {unusedFilenameSync} from 'unused-filename';
+import pupa from 'pupa';
+import extName from 'ext-name';
 
-class CancelError extends Error {}
+export class CancelError extends Error {}
 
 const getFilenameFromMime = (name, mime) => {
 	const extensions = extName.mime(mime);
@@ -15,39 +20,6 @@ const getFilenameFromMime = (name, mime) => {
 	}
 
 	return `${name}.${extensions[0].ext}`;
-};
-
-const majorElectronVersion = () => {
-	const version = process.versions.electron.split('.');
-	return Number.parseInt(version[0], 10);
-};
-
-const getWindowFromBrowserView = webContents => {
-	for (const currentWindow of BrowserWindow.getAllWindows()) {
-		for (const currentBrowserView of currentWindow.getBrowserViews()) {
-			if (currentBrowserView.webContents.id === webContents.id) {
-				return currentWindow;
-			}
-		}
-	}
-};
-
-const getWindowFromWebContents = webContents => {
-	let window_;
-	const webContentsType = webContents.getType();
-	switch (webContentsType) {
-		case 'webview':
-			window_ = BrowserWindow.fromWebContents(webContents.hostWebContents);
-			break;
-		case 'browserView':
-			window_ = getWindowFromBrowserView(webContents);
-			break;
-		default:
-			window_ = BrowserWindow.fromWebContents(webContents);
-			break;
-	}
-
-	return window_;
 };
 
 function registerListener(session, options, callback = () => {}) {
@@ -61,20 +33,23 @@ function registerListener(session, options, callback = () => {}) {
 	options = {
 		showBadge: true,
 		showProgressBar: true,
-		...options
+		...options,
 	};
 
 	const listener = (event, item, webContents) => {
 		downloadItems.add(item);
 		totalBytes += item.getTotalBytes();
 
-		const window_ = majorElectronVersion() >= 12 ? BrowserWindow.fromWebContents(webContents) : getWindowFromWebContents(webContents);
+		const window_ = BrowserWindow.fromWebContents(webContents);
+		if (!window_) {
+			throw new Error('Failed to get window from web contents.');
+		}
 
 		if (options.directory && !path.isAbsolute(options.directory)) {
 			throw new Error('The `directory` option must be an absolute path');
 		}
 
-		const directory = options.directory || app.getPath('downloads');
+		const directory = options.directory ?? app.getPath('downloads');
 
 		let filePath;
 		if (options.filename) {
@@ -83,10 +58,10 @@ function registerListener(session, options, callback = () => {}) {
 			const filename = item.getFilename();
 			const name = path.extname(filename) ? filename : getFilenameFromMime(filename, item.getMimeType());
 
-			filePath = options.overwrite ? path.join(directory, name) : unusedFilename.sync(path.join(directory, name));
+			filePath = options.overwrite ? path.join(directory, name) : unusedFilenameSync(path.join(directory, name));
 		}
 
-		const errorMessage = options.errorMessage || 'The download of {filename} was interrupted';
+		const errorMessage = options.errorMessage ?? 'The download of {filename} was interrupted';
 
 		if (options.saveAs) {
 			item.setSaveDialogOptions({defaultPath: filePath, ...options.dialogOptions});
@@ -115,7 +90,7 @@ function registerListener(session, options, callback = () => {}) {
 				options.onProgress({
 					percent: itemTotalBytes ? itemTransferredBytes / itemTotalBytes : 0,
 					transferredBytes: itemTransferredBytes,
-					totalBytes: itemTotalBytes
+					totalBytes: itemTotalBytes,
 				});
 			}
 
@@ -123,7 +98,7 @@ function registerListener(session, options, callback = () => {}) {
 				options.onTotalProgress({
 					percent: progressDownloadItems(),
 					transferredBytes: receivedBytes,
-					totalBytes
+					totalBytes,
 				});
 			}
 		});
@@ -152,6 +127,7 @@ function registerListener(session, options, callback = () => {}) {
 				if (typeof options.onCancel === 'function') {
 					options.onCancel(item);
 				}
+
 				callback(new CancelError());
 			} else if (state === 'interrupted') {
 				const message = pupa(errorMessage, {filename: path.basename(filePath)});
@@ -174,7 +150,7 @@ function registerListener(session, options, callback = () => {}) {
 						path: savePath,
 						fileSize: item.getReceivedBytes(),
 						mimeType: item.getMimeType(),
-						url: item.getURL()
+						url: item.getURL(),
 					});
 				}
 
@@ -190,32 +166,32 @@ function registerListener(session, options, callback = () => {}) {
 	session.on('will-download', listener);
 }
 
-module.exports = (options = {}) => {
+export default function electronDl(options = {}) {
 	app.on('session-created', session => {
 		registerListener(session, options, (error, _) => {
 			if (error && !(error instanceof CancelError)) {
-				const errorTitle = options.errorTitle || 'Download Error';
+				const errorTitle = options.errorTitle ?? 'Download Error';
 				dialog.showErrorBox(errorTitle, error.message);
 			}
 		});
 	});
-};
+}
 
-module.exports.download = (window_, url, options) => new Promise((resolve, reject) => {
-	options = {
-		...options,
-		unregisterWhenDone: true
-	};
+export async function download(window_, url, options) {
+	return new Promise((resolve, reject) => {
+		options = {
+			...options,
+			unregisterWhenDone: true,
+		};
 
-	registerListener(window_.webContents.session, options, (error, item) => {
-		if (error) {
-			reject(error);
-		} else {
-			resolve(item);
-		}
+		registerListener(window_.webContents.session, options, (error, item) => {
+			if (error) {
+				reject(error);
+			} else {
+				resolve(item);
+			}
+		});
+
+		window_.webContents.downloadURL(url);
 	});
-
-	window_.webContents.downloadURL(url);
-});
-
-module.exports.CancelError = CancelError;
+}

@@ -8,7 +8,6 @@
 - Saves the file to the users Downloads directory instead of prompting.
 - Bounces the Downloads directory in the dock when done. *(macOS)*
 - Handles multiple downloads.
-- Support for `BrowserWindow` and `BrowserView`.
 - Shows badge count *(macOS & Linux only)* and download progress. Example on macOS:
 
 <img src="screenshot.png" width="82">
@@ -19,7 +18,7 @@
 npm install electron-dl
 ```
 
-Requires Electron 7 or later.
+*Requires Electron 30 or later.*
 
 ## Usage
 
@@ -28,15 +27,15 @@ Requires Electron 7 or later.
 This is probably what you want for your app.
 
 ```js
-const {app, BrowserWindow} = require('electron');
-const electronDl = require('electron-dl');
+import {app, BrowserWindow} from 'electron';
+import electronDl from 'electron-dl';
 
 electronDl();
 
-let win;
+let mainWindow;
 (async () => {
 	await app.whenReady();
-	win = new BrowserWindow();
+	mainWindow = new BrowserWindow();
 })();
 ```
 
@@ -45,20 +44,20 @@ let win;
 This can be useful if you need download functionality in a reusable module.
 
 ```js
-const {BrowserWindow, ipcMain} = require('electron');
-const {download} = require('electron-dl');
+import {BrowserWindow, ipcMain} from 'electron';
+import {download, CancelError} from 'electron-dl';
 
 ipcMain.on('download-button', async (event, {url}) => {
- 	const win = BrowserWindow.getFocusedWindow();
-     try {
-         console.log(await download(win, url));
-     } catch (error) {
-         if (error instanceof electronDl.CancelError) {
-         	console.info('item.cancel() was called');
-		 } else {
-		 	console.error(error);
-		 }
-	 }
+	const win = BrowserWindow.getFocusedWindow();
+	try {
+		console.log(await download(win, url));
+	} catch (error) {
+		if (error instanceof CancelError) {
+			console.info('item.cancel() was called');
+		} else {
+			console.error(error);
+		}
+	}
 });
 ```
 
@@ -68,19 +67,19 @@ It can only be used in the [main](https://electronjs.org/docs/glossary/#main-pro
 
 ### electronDl(options?)
 
-### electronDl.download(window, url, options?): Promise<[DownloadItem](https://electronjs.org/docs/api/download-item)>
+### download(window, url, options?): Promise<[DownloadItem](https://electronjs.org/docs/api/download-item)>
 
 ### window
 
-Type: `BrowserWindow | BrowserView`
+Type: `BrowserWindow | WebContentsView`
 
-Window to register the behavior on. Alternatively, a `BrowserView` can be passed.
+The window to register the behavior on. Alternatively, a `WebContentsView` can be passed.
 
 ### url
 
 Type: `string`
 
-URL to download.
+The URL to download.
 
 ### options
 
@@ -234,13 +233,13 @@ If `defaultPath` is not explicity defined, a default value is assigned based on 
 
 After making changes, run the automated tests:
 
-```
-$ npm test
+```sh
+npm test
 ```
 
 And before submitting a pull request, run the manual tests to manually verify that everything works:
 
-```
+```sh
 npm start
 ```
 
