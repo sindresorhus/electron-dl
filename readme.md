@@ -18,7 +18,7 @@
 npm install electron-dl
 ```
 
-*Requires Electron 30 or later.*
+*Requires Electron 44 or later.*
 
 ## Usage
 

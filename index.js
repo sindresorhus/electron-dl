@@ -12,15 +12,10 @@ import extName from 'ext-name';
 
 export class CancelError extends Error {}
 
-// TODO: Use https://nodejs.org/api/util.html#class-utilmimetype when targeting Node.js 20.
 const getFilenameFromMime = (name, mime) => {
 	const extensions = extName.mime(mime);
 
-	if (extensions.length !== 1) {
-		return name;
-	}
-
-	return `${name}.${extensions[0].ext}`;
+	return extensions.length === 1 ? `${name}.${extensions[0].ext}` : name;
 };
 
 function registerListener(session, options, callback = () => {}) {
@@ -38,15 +33,15 @@ function registerListener(session, options, callback = () => {}) {
 	};
 
 	const listener = (event, item, webContents) => {
+		if (options.directory && !path.isAbsolute(options.directory)) {
+			throw new Error('The `directory` option must be an absolute path');
+		}
+
 		downloadItems.add(item);
 		totalBytes += item.getTotalBytes();
 
 		// `webContents` is null for `session.downloadURL()`, and there is no window for a detached `WebContentsView`.
 		const window_ = webContents ? BrowserWindow.fromWebContents(webContents) : undefined;
-
-		if (options.directory && !path.isAbsolute(options.directory)) {
-			throw new Error('The `directory` option must be an absolute path');
-		}
 
 		const directory = options.directory ?? app.getPath('downloads');
 
@@ -70,8 +65,8 @@ function registerListener(session, options, callback = () => {}) {
 
 		item.on('updated', () => {
 			receivedBytes = completedBytes;
-			for (const item of downloadItems) {
-				receivedBytes += item.getReceivedBytes();
+			for (const activeItem of downloadItems) {
+				receivedBytes += activeItem.getReceivedBytes();
 			}
 
 			if (options.showBadge && ['darwin', 'linux'].includes(process.platform)) {
@@ -102,7 +97,7 @@ function registerListener(session, options, callback = () => {}) {
 			}
 		});
 
-		item.on('done', (event, state) => {
+		item.on('done', (_event, state) => {
 			completedBytes += item.getTotalBytes();
 			downloadItems.delete(item);
 
@@ -170,11 +165,13 @@ function registerListener(session, options, callback = () => {}) {
 
 export default function electronDl(options = {}) {
 	app.on('session-created', session => {
-		registerListener(session, options, (error, _) => {
-			if (error && !(error instanceof CancelError)) {
-				const errorTitle = options.errorTitle ?? 'Download Error';
-				dialog.showErrorBox(errorTitle, error.message);
+		registerListener(session, options, error => {
+			if (!error || error instanceof CancelError) {
+				return;
 			}
+
+			const errorTitle = options.errorTitle ?? 'Download Error';
+			dialog.showErrorBox(errorTitle, error.message);
 		});
 	});
 }
@@ -189,9 +186,10 @@ export async function download(window_, url, options) {
 		registerListener(window_.webContents.session, options, (error, item) => {
 			if (error) {
 				reject(error);
-			} else {
-				resolve(item);
+				return;
 			}
+
+			resolve(item);
 		});
 
 		window_.webContents.downloadURL(url);

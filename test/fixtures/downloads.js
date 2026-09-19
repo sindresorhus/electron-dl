@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {Buffer} from 'node:buffer';
 import {once} from 'node:events';
 import {mkdtemp, readFile, rm} from 'node:fs/promises';
 import http from 'node:http';
@@ -76,7 +77,9 @@ async function testOwner(url, directory) {
 	// Record the progress bar values instead of showing them in the dock/taskbar.
 	const progress = [];
 	if (window_) {
-		window_.setProgressBar = value => progress.push(value);
+		window_.setProgressBar = value => {
+			progress.push(value);
+		};
 	}
 
 	try {
@@ -86,14 +89,14 @@ async function testOwner(url, directory) {
 		// `download()` registers a listener with `unregisterWhenDone`, so the count must be back to what it was.
 		assert.equal(downloadSession.listenerCount('will-download'), listeners);
 		if (window_) {
-			assert(progress.some(value => value >= 0));
+			assert.ok(progress.some(value => value >= 0));
 			assert.equal(progress.at(-1), -1);
 		}
 
 		await assert.rejects(download(owner, url(8192), {
 			directory,
 			showBadge: false,
-			onStarted: item => item.cancel(),
+			onStarted: downloadItem => downloadItem.cancel(),
 		}), CancelError);
 		assert.equal(downloadSession.listenerCount('will-download'), listeners);
 	} finally {

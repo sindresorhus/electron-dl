@@ -5,11 +5,7 @@
 	"license": "MIT",
 	"repository": "sindresorhus/electron-dl",
 	"funding": "https://github.com/sponsors/sindresorhus",
-	"author": {
-		"name": "Sindre Sorhus",
-		"email": "sindresorhus@gmail.com",
-		"url": "https://sindresorhus.com"
-	},
+	"author": "Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)",
 	"type": "module",
 	"exports": {
 		"types": "./index.d.ts",
@@ -17,11 +13,10 @@
 	},
 	"sideEffects": false,
 	"engines": {
-		"node": ">=18"
+		"node": ">=22"
 	},
 	"scripts": {
 		"start": "electron run.js",
-		"//test": "xo && ava && tsc index.d.ts",
 		"test": "xo && ava test/downloads.js && tsc index.d.ts"
 	},
 	"files": [
@@ -38,25 +33,21 @@
 	],
 	"dependencies": {
 		"ext-name": "^5.0.0",
-		"pupa": "^3.1.0",
+		"pupa": "^3.3.0",
 		"unused-filename": "^4.0.1"
 	},
 	"devDependencies": {
-		"@types/node": "^20.12.7",
-		"ava": "^6.1.2",
-		"copy-file": "^11.0.0",
-		"electron": "^39.0.0",
+		"@types/node": "^26.6.2",
+		"ava": "^8.0.1",
+		"electron": "^44.4.3",
 		"minimist": "^1.2.8",
 		"node-static": "^0.7.11",
-		"pify": "^6.1.0",
-		"spectron": "^19.0.0",
-		"typescript": "^5.4.5",
-		"xo": "^0.58.0"
+		"typescript": "^6.0.3",
+		"xo": "^5.0.1"
 	},
 	"xo": {
-		"envs": [
-			"node",
-			"browser"
+		"ignores": [
+			"mock"
 		]
 	},
 	"ava": {

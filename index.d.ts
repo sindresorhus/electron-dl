@@ -182,5 +182,5 @@ ipcMain.on('download-button', async (event, {url}) => {
 export function download(
 	window: BrowserWindow | WebContentsView,
 	url: string,
-	options?: Options
+	options?: Options,
 ): Promise<DownloadItem>;
