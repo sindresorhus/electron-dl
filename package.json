@@ -33,6 +33,7 @@
 	],
 	"dependencies": {
 		"ext-name": "^5.0.0",
+		"is-safe-filename": "^0.1.1",
 		"pupa": "^3.3.0",
 		"unused-filename": "^4.0.1"
 	},

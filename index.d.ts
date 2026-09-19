@@ -40,6 +40,9 @@ export type Options = {
 
 	/**
 	Name of the saved file.
+
+	Must not contain a path separator, so it cannot point outside `directory`.
+
 	This option only makes sense for `electronDl.download()`.
 
 	Default: [`downloadItem.getFilename()`](https://electronjs.org/docs/api/download-item/#downloaditemgetfilename)
@@ -161,6 +164,8 @@ export default function electronDl(options?: Options): void;
 
 /**
 This can be useful if you need download functionality in a reusable module.
+
+An interrupted download is resumed automatically when the server supports it, as long as the app is running. A download is not resumed after the app is restarted, since that would need the app to persist the download state.
 
 @param window - Window to register the behavior on.
 @param url - URL to download.

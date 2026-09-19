@@ -16,6 +16,9 @@ for (const source of ['session', 'view', 'window']) {
 		delete env.ELECTRON_RUN_AS_NODE;
 
 		// The `signal` option is used instead of `timeout`, because Electron exits with code 0 when it is killed, which would make a hanging fixture look like a pass.
-		await t.notThrowsAsync(run(electron, [fixture, source], {env, signal: AbortSignal.timeout(30_000)}));
+		const {stderr} = await run(electron, [fixture, source], {env, signal: AbortSignal.timeout(30_000)});
+
+		// A native `CHECK` failure only reaches stderr and still exits with code 0, so it has to be detected here. Resuming a download from inside its own event handler trips it.
+		t.false(stderr.includes('Check failed'), `Electron logged a native CHECK failure:\n${stderr}`);
 	});
 }

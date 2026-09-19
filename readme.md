@@ -8,7 +8,7 @@
 - Saves the file to the users Downloads directory instead of prompting.
 - Bounces the Downloads directory in the dock when done. *(macOS)*
 - Handles multiple downloads.
-- Resumes interrupted downloads when the server supports it.
+- Resumes interrupted downloads when the server supports it, while the app is running.
 - Shows badge count *(macOS & Linux only)* and download progress. Example on macOS:
 
 <img src="screenshot.png" width="82">
@@ -72,6 +72,8 @@ It can only be used in the [main](https://electronjs.org/docs/glossary/#main-pro
 
 Multiple calls can be in progress at the same time. Each call handles its own download.
 
+An interrupted download is resumed automatically when the server supports it, as long as the app is running. A download is not resumed after the app is restarted, since that would need the app to persist the download state.
+
 ### window
 
 Type: `BrowserWindow | WebContentsView`
@@ -112,6 +114,8 @@ Type: `string`\
 Default: [`downloadItem.getFilename()`](https://electronjs.org/docs/api/download-item/#downloaditemgetfilename)
 
 Name of the saved file.
+
+Must not contain a path separator, so it cannot point outside `directory`.
 
 This option only makes sense for `electronDl.download()`.
 

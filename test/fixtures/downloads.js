@@ -13,6 +13,7 @@ import {
 	WebContentsView,
 	session,
 } from 'electron';
+import {unsafeFilenameFixtures} from 'is-safe-filename';
 import electronDl, {download, CancelError} from '../../index.js';
 
 // Which download source to test: `session` (`session.downloadURL()`, no `webContents`), `view` (detached `WebContentsView`, no window), or `window` (`BrowserWindow`).
@@ -164,6 +165,7 @@ async function testOwner(url, directory) {
 
 		await download(owner, url(4096), {...explicitFilename, overwrite: true});
 		assert.deepEqual(await readFile(path.join(directory, 'report.bin')), Buffer.alloc(4096, 'x'));
+
 		assert.equal(downloadSession.listenerCount('will-download'), listeners);
 	} finally {
 		if (window_) {
@@ -201,6 +203,18 @@ async function testConcurrent(url, directory) {
 		// Chromium normalizes the URL, so a URL that is not already in its normalized form must still match.
 		const unnormalized = await download(owner, `HTTP://127.0.0.1:${new URL(url(4096)).port}/a/../4096`, {directory, filename: 'unnormalized.bin', showBadge: false});
 		assert.deepEqual(await readFile(unnormalized.getSavePath()), Buffer.alloc(4096, 'x'));
+
+		// A relative `directory` must reject instead of throwing out of the `will-download` listener, which would leave the promise unsettled.
+		await assert.rejects(download(owner, url(4096), {directory: 'relative', showBadge: false}), {message: 'The `directory` option must be an absolute path'});
+		assert.equal(downloadSession.listenerCount('will-download'), listeners);
+
+		// A `filename` that could escape `directory` must be rejected, since it would otherwise write outside the directory the app chose.
+		await Promise.all(unsafeFilenameFixtures.map(filename => assert.rejects(
+			download(owner, url(4096), {directory, filename, showBadge: false}),
+			{message: /Unsafe filename/v},
+		)));
+
+		assert.equal(downloadSession.listenerCount('will-download'), listeners);
 
 		// Concurrent calls for the same URL must still each get their own item.
 		const sameUrl = await Promise.all([

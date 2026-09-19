@@ -6,6 +6,7 @@ import {
 	shell,
 	dialog,
 } from 'electron';
+import {assertSafeFilename} from 'is-safe-filename';
 import {unusedFilenameSync} from 'unused-filename';
 import pupa from 'pupa';
 import extName from 'ext-name';
@@ -22,6 +23,23 @@ const getFilenameFromMime = (name, mime) => {
 };
 
 function registerListener(session, options, callback = () => {}, {ownerWindow, url} = {}) {
+	options = {
+		showBadge: true,
+		showProgressBar: true,
+		...options,
+	};
+
+	// Checked here instead of in the listener, where a throw would escape as an uncaught exception and leave the `download()` promise unsettled.
+	if (options.directory && !path.isAbsolute(options.directory)) {
+		throw new Error('The `directory` option must be an absolute path');
+	}
+
+	// A `filename` with a path separator could escape `directory`, so it has to be a plain filename.
+	if (options.filename !== undefined) {
+		assertSafeFilename(options.filename);
+	}
+
+	const directory = options.directory ?? app.getPath('downloads');
 	const downloadItems = new Set();
 	let receivedBytes = 0;
 	let completedBytes = 0;
@@ -29,12 +47,6 @@ function registerListener(session, options, callback = () => {}, {ownerWindow, u
 	const activeDownloadItems = () => downloadItems.size;
 	// The total size is 0 when it is not known, for example for a response without `Content-Length`.
 	const progressDownloadItems = () => totalBytes === 0 ? 0 : receivedBytes / totalBytes;
-
-	options = {
-		showBadge: true,
-		showProgressBar: true,
-		...options,
-	};
 
 	const listener = (event, item, webContents) => {
 		// Every `will-download` listener is notified of every download on the session, so `download()` ignores the items of other calls and only ever takes a single item.
@@ -47,17 +59,11 @@ function registerListener(session, options, callback = () => {}, {ownerWindow, u
 			session.removeListener('will-download', listener);
 		}
 
-		if (options.directory && !path.isAbsolute(options.directory)) {
-			throw new Error('The `directory` option must be an absolute path');
-		}
-
 		downloadItems.add(item);
 		totalBytes += item.getTotalBytes();
 
 		// `webContents` is null for `session.downloadURL()`, and there is no window for a detached `WebContentsView`.
 		const window_ = ownerWindow ?? (webContents ? BrowserWindow.fromWebContents(webContents) : undefined);
-
-		const directory = options.directory ?? app.getPath('downloads');
 
 		let name;
 		if (options.filename) {
@@ -111,8 +117,13 @@ function registerListener(session, options, callback = () => {}, {ownerWindow, u
 			}
 
 			// Chromium stops retrying an interrupted download without ending it, so resume it when the server supports it.
+			// Resuming has to happen outside this handler, since Chromium asserts when a download re-enters its own observer notification.
 			if (state === 'interrupted' && item.canResume()) {
-				item.resume();
+				setTimeout(() => {
+					if (item.canResume()) {
+						item.resume();
+					}
+				}, 0);
 			}
 		});
 
