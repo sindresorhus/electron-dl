@@ -18,7 +18,7 @@ const getFilenameFromMime = (name, mime) => {
 	return extensions.length === 1 ? `${name}.${extensions[0].ext}` : name;
 };
 
-function registerListener(session, options, callback = () => {}) {
+function registerListener(session, options, callback = () => {}, ownerWindow) {
 	const downloadItems = new Set();
 	let receivedBytes = 0;
 	let completedBytes = 0;
@@ -41,7 +41,7 @@ function registerListener(session, options, callback = () => {}) {
 		totalBytes += item.getTotalBytes();
 
 		// `webContents` is null for `session.downloadURL()`, and there is no window for a detached `WebContentsView`.
-		const window_ = webContents ? BrowserWindow.fromWebContents(webContents) : undefined;
+		const window_ = ownerWindow ?? (webContents ? BrowserWindow.fromWebContents(webContents) : undefined);
 
 		const directory = options.directory ?? app.getPath('downloads');
 
@@ -183,15 +183,18 @@ export async function download(window_, url, options) {
 			unregisterWhenDone: true,
 		};
 
-		registerListener(window_.webContents.session, options, (error, item) => {
+		const {session} = window_.webContents;
+
+		// Start the download from the session instead of the `webContents` so it is not subject to the page's origin checks.
+		registerListener(session, options, (error, item) => {
 			if (error) {
 				reject(error);
 				return;
 			}
 
 			resolve(item);
-		});
+		}, BrowserWindow.fromWebContents(window_.webContents));
 
-		window_.webContents.downloadURL(url);
+		session.downloadURL(url);
 	});
 }

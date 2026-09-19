@@ -72,6 +72,12 @@ async function testOwner(url, directory) {
 		: new BrowserWindow({show: false, webPreferences: {session: downloadSession}});
 	const window_ = BrowserWindow.fromWebContents(owner.webContents);
 	assert.equal(window_, source === 'view' ? null : owner);
+
+	// `download()` starts the download from the session, so `will-download` must not have a `webContents`.
+	downloadSession.on('will-download', (event, item, webContents) => {
+		assert.equal(webContents, null);
+	});
+
 	const listeners = downloadSession.listenerCount('will-download');
 
 	// Record the progress bar values instead of showing them in the dock/taskbar.
