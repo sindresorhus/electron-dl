@@ -24,7 +24,8 @@ function registerListener(session, options, callback = () => {}, ownerWindow) {
 	let completedBytes = 0;
 	let totalBytes = 0;
 	const activeDownloadItems = () => downloadItems.size;
-	const progressDownloadItems = () => receivedBytes / totalBytes;
+	// The total size is 0 when it is not known, for example for a response without `Content-Length`.
+	const progressDownloadItems = () => totalBytes === 0 ? 0 : receivedBytes / totalBytes;
 
 	options = {
 		showBadge: true,

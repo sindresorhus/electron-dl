@@ -63,6 +63,15 @@ async function testSession(url, directory) {
 	// Download twice with the same listener to check that byte counters reset between downloads.
 	await checkDownload(4096);
 	await checkDownload(8192);
+
+	// A download of unknown size must not report `NaN` (https://github.com/sindresorhus/electron-dl/issues/100).
+	progress = undefined;
+	const chunked = await new Promise(resolve => {
+		completed = resolve;
+		downloadSession.downloadURL(url(4096, true));
+	});
+	assert.deepEqual(await readFile(chunked.path), Buffer.alloc(4096, 'x'));
+	assert.deepEqual(progress, {percent: 0, transferredBytes: 4096, totalBytes: 0});
 }
 
 async function testOwner(url, directory) {
@@ -128,19 +137,20 @@ async function testOwner(url, directory) {
 async function run() {
 	const directory = await mkdtemp(path.join(os.tmpdir(), 'electron-dl-'));
 
-	// Serves a file of the size given in the URL path, for example `/4096`.
+	// Serves a file of the size given in the URL path, for example `/4096`. A `chunked` path omits `Content-Length`, which leaves the total size unknown.
 	const server = http.createServer((request, response) => {
-		const data = Buffer.alloc(Number(request.url.slice(1)), 'x');
+		const [size, chunked] = request.url.slice(1).split('?', 2);
+		const data = Buffer.alloc(Number(size), 'x');
 		response.writeHead(200, {
 			'Content-Type': 'application/octet-stream',
 			'Content-Disposition': 'attachment; filename="fixture.bin"',
-			'Content-Length': data.length,
+			...!chunked && {'Content-Length': data.length},
 		});
 		response.end(data);
 	});
 	server.listen(0, '127.0.0.1');
 	await once(server, 'listening');
-	const url = size => `http://127.0.0.1:${server.address().port}/${size}`;
+	const url = (size, chunked) => `http://127.0.0.1:${server.address().port}/${size}${chunked ? '?chunked' : ''}`;
 
 	try {
 		await (source === 'session' ? testSession(url, directory) : testOwner(url, directory));
