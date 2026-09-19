@@ -45,15 +45,15 @@ function registerListener(session, options, callback = () => {}, ownerWindow) {
 
 		const directory = options.directory ?? app.getPath('downloads');
 
-		let filePath;
+		let name;
 		if (options.filename) {
-			filePath = path.join(directory, options.filename);
+			name = options.filename;
 		} else {
 			const filename = item.getFilename();
-			const name = path.extname(filename) ? filename : getFilenameFromMime(filename, item.getMimeType());
-
-			filePath = options.overwrite ? path.join(directory, name) : unusedFilenameSync(path.join(directory, name));
+			name = path.extname(filename) ? filename : getFilenameFromMime(filename, item.getMimeType());
 		}
+
+		const filePath = options.overwrite ? path.join(directory, name) : unusedFilenameSync(path.join(directory, name));
 
 		const errorMessage = options.errorMessage ?? 'The download of {filename} was interrupted';
 

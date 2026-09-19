@@ -105,6 +105,17 @@ async function testOwner(url, directory) {
 			onStarted: downloadItem => downloadItem.cancel(),
 		}), CancelError);
 		assert.equal(downloadSession.listenerCount('will-download'), listeners);
+
+		// `filename` must not bypass `overwrite` (https://github.com/sindresorhus/electron-dl/issues/144).
+		const explicitFilename = {directory, filename: 'report.bin', showBadge: false};
+		const first = await download(owner, url(1024), explicitFilename);
+		const second = await download(owner, url(1024), explicitFilename);
+		assert.equal(path.basename(first.getSavePath()), 'report.bin');
+		assert.equal(path.basename(second.getSavePath()), 'report (1).bin');
+
+		await download(owner, url(4096), {...explicitFilename, overwrite: true});
+		assert.deepEqual(await readFile(path.join(directory, 'report.bin')), Buffer.alloc(4096, 'x'));
+		assert.equal(downloadSession.listenerCount('will-download'), listeners);
 	} finally {
 		if (window_) {
 			window_.destroy();
