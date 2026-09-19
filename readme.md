@@ -69,6 +69,8 @@ It can only be used in the [main](https://electronjs.org/docs/glossary/#main-pro
 
 ### download(window, url, options?): Promise<[DownloadItem](https://electronjs.org/docs/api/download-item)>
 
+Multiple calls can be in progress at the same time. Each call handles its own download.
+
 ### window
 
 Type: `BrowserWindow | WebContentsView`

@@ -12,13 +12,16 @@ import extName from 'ext-name';
 
 export class CancelError extends Error {}
 
+// The items already taken by a `download()` call, so that concurrent calls for the same URL each get their own item.
+const claimedItems = new WeakSet();
+
 const getFilenameFromMime = (name, mime) => {
 	const extensions = extName.mime(mime);
 
 	return extensions.length === 1 ? `${name}.${extensions[0].ext}` : name;
 };
 
-function registerListener(session, options, callback = () => {}, ownerWindow) {
+function registerListener(session, options, callback = () => {}, {ownerWindow, url} = {}) {
 	const downloadItems = new Set();
 	let receivedBytes = 0;
 	let completedBytes = 0;
@@ -34,6 +37,16 @@ function registerListener(session, options, callback = () => {}, ownerWindow) {
 	};
 
 	const listener = (event, item, webContents) => {
+		// Every `will-download` listener is notified of every download on the session, so `download()` ignores the items of other calls and only ever takes a single item.
+		if (url !== undefined) {
+			if (item.getURLChain().at(0) !== url || claimedItems.has(item)) {
+				return;
+			}
+
+			claimedItems.add(item);
+			session.removeListener('will-download', listener);
+		}
+
 		if (options.directory && !path.isAbsolute(options.directory)) {
 			throw new Error('The `directory` option must be an absolute path');
 		}
@@ -116,10 +129,6 @@ function registerListener(session, options, callback = () => {}, ownerWindow) {
 				totalBytes = 0;
 			}
 
-			if (options.unregisterWhenDone) {
-				session.removeListener('will-download', listener);
-			}
-
 			// eslint-disable-next-line unicorn/prefer-switch
 			if (state === 'cancelled') {
 				if (typeof options.onCancel === 'function') {
@@ -179,12 +188,10 @@ export default function electronDl(options = {}) {
 
 export async function download(window_, url, options) {
 	return new Promise((resolve, reject) => {
-		options = {
-			...options,
-			unregisterWhenDone: true,
-		};
-
 		const {session} = window_.webContents;
+
+		// Chromium normalizes the URL, so it must be normalized here too for the item to be recognized as this call's download.
+		const normalizedUrl = new URL(url).href;
 
 		// Start the download from the session instead of the `webContents` so it is not subject to the page's origin checks.
 		registerListener(session, options, (error, item) => {
@@ -194,8 +201,11 @@ export async function download(window_, url, options) {
 			}
 
 			resolve(item);
-		}, BrowserWindow.fromWebContents(window_.webContents));
+		}, {
+			ownerWindow: BrowserWindow.fromWebContents(window_.webContents),
+			url: normalizedUrl,
+		});
 
-		session.downloadURL(url);
+		session.downloadURL(normalizedUrl);
 	});
 }

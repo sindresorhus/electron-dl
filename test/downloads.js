@@ -14,6 +14,8 @@ for (const source of ['session', 'view', 'window']) {
 		// Electron-based hosts (for example, VS Code) set `ELECTRON_RUN_AS_NODE`, which would make Electron run the fixture as plain Node.js.
 		const env = {...process.env};
 		delete env.ELECTRON_RUN_AS_NODE;
-		await t.notThrowsAsync(run(electron, [fixture, source], {env, timeout: 30_000}));
+
+		// The `signal` option is used instead of `timeout`, because Electron exits with code 0 when it is killed, which would make a hanging fixture look like a pass.
+		await t.notThrowsAsync(run(electron, [fixture, source], {env, signal: AbortSignal.timeout(30_000)}));
 	});
 }
