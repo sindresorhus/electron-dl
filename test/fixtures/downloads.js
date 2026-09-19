@@ -47,8 +47,12 @@ async function testSession(url, directory) {
 	// Use a separate session so the `session-created` event fires after `electronDl()` has registered its listener.
 	const downloadSession = session.fromPartition('downloads');
 	const webContentsValues = [];
+	let isInterrupted = false;
 	downloadSession.on('will-download', (event, item, webContents) => {
 		webContentsValues.push(webContents);
+		item.on('updated', (_event, state) => {
+			isInterrupted ||= state === 'interrupted';
+		});
 	});
 
 	const checkDownload = async size => {
@@ -77,6 +81,16 @@ async function testSession(url, directory) {
 	});
 	assert.deepEqual(await readFile(chunked.path), Buffer.alloc(4096, 'x'));
 	assert.deepEqual(progress, {percent: 0, transferredBytes: 4096, totalBytes: 0});
+
+	// An interrupted download is resumed when the server supports it (https://github.com/sindresorhus/electron-dl/issues/174).
+	isInterrupted = false;
+	const size = 64 * 1024;
+	const resumed = await new Promise(resolve => {
+		completed = resolve;
+		downloadSession.downloadURL(url(size, '?dropping'));
+	});
+	assert.deepEqual(await readFile(resumed.path), Buffer.alloc(size, 'x'));
+	assert.ok(isInterrupted, 'the download must be interrupted before it can be resumed');
 
 	// A download started by a `webContents` reports that `webContents`, and the window is found from it to show the progress bar.
 	const window_ = new BrowserWindow({show: false, webPreferences: {session: downloadSession}});
@@ -207,7 +221,9 @@ async function testConcurrent(url, directory) {
 async function run() {
 	const directory = await mkdtemp(path.join(os.tmpdir(), 'electron-dl-'));
 
-	// Serves a file of the size given in the URL path, for example `/4096`. The `chunked` parameter omits `Content-Length`, which leaves the total size unknown, and `redirect` serves the file through a redirect.
+	// Serves a file of the size given in the URL path, for example `/4096`. The `chunked` parameter omits `Content-Length`, which leaves the total size unknown, `redirect` serves the file through a redirect, and `dropping` drops the connection part-way through.
+	let droppingRequests = 0;
+
 	const server = http.createServer((request, response) => {
 		const [size, search] = request.url.slice(1).split('?', 2);
 		const parameters = new URLSearchParams(search);
@@ -219,6 +235,35 @@ async function run() {
 		}
 
 		const data = Buffer.alloc(Number(size), 'x');
+
+		// Drops every connection until Chromium has given up retrying, so the download can only finish after it is resumed.
+		if (parameters.has('dropping')) {
+			const {range} = request.headers;
+			const start = range ? Number(/(?<start>\d+)/v.exec(range).groups.start) : 0;
+			const remaining = data.subarray(start);
+
+			response.writeHead(206, {
+				'Content-Type': 'application/octet-stream',
+				'Content-Disposition': 'attachment; filename="fixture.bin"',
+				'Content-Length': remaining.length,
+				'Content-Range': `bytes ${start}-${data.length - 1}/${data.length}`,
+				'Accept-Ranges': 'bytes',
+				ETag: '"fixture"',
+				'Last-Modified': 'Wed, 18 Feb 2026 03:27:43 GMT',
+			});
+
+			if (droppingRequests++ < 10) {
+				response.write(remaining.subarray(0, Math.floor(remaining.length / 2)));
+				setTimeout(() => {
+					response.destroy();
+				}, 20);
+			} else {
+				response.end(remaining);
+			}
+
+			return;
+		}
+
 		response.writeHead(200, {
 			'Content-Type': 'application/octet-stream',
 			'Content-Disposition': 'attachment; filename="fixture.bin"',

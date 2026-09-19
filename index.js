@@ -77,7 +77,7 @@ function registerListener(session, options, callback = () => {}, {ownerWindow, u
 			item.setSavePath(filePath);
 		}
 
-		item.on('updated', () => {
+		item.on('updated', (_event, state) => {
 			receivedBytes = completedBytes;
 			for (const activeItem of downloadItems) {
 				receivedBytes += activeItem.getReceivedBytes();
@@ -108,6 +108,11 @@ function registerListener(session, options, callback = () => {}, {ownerWindow, u
 					transferredBytes: receivedBytes,
 					totalBytes,
 				});
+			}
+
+			// Chromium stops retrying an interrupted download without ending it, so resume it when the server supports it.
+			if (state === 'interrupted' && item.canResume()) {
+				item.resume();
 			}
 		});
 

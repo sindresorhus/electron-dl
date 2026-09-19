@@ -8,6 +8,7 @@
 - Saves the file to the users Downloads directory instead of prompting.
 - Bounces the Downloads directory in the dock when done. *(macOS)*
 - Handles multiple downloads.
+- Resumes interrupted downloads when the server supports it.
 - Shows badge count *(macOS & Linux only)* and download progress. Example on macOS:
 
 <img src="screenshot.png" width="82">
