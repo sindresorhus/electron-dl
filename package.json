@@ -22,7 +22,7 @@
 	"scripts": {
 		"start": "electron run.js",
 		"//test": "xo && ava && tsc index.d.ts",
-		"test": "xo && tsc index.d.ts"
+		"test": "xo && ava test/downloads.js && tsc index.d.ts"
 	},
 	"files": [
 		"index.js",
@@ -60,6 +60,7 @@
 		]
 	},
 	"ava": {
-		"serial": true
+		"serial": true,
+		"timeout": "1m"
 	}
 }

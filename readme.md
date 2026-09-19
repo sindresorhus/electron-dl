@@ -211,6 +211,8 @@ Default: `true`
 
 Show a progress bar on the dock/taskbar icon when a download is in progress.
 
+Downloads without an associated `BrowserWindow` are saved normally, but do not show a progress bar.
+
 #### overwrite
 
 Type: `boolean`\

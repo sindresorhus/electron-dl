@@ -1,8 +1,8 @@
 import {
-	type BrowserView,
 	type BrowserWindow,
 	type DownloadItem,
 	type SaveDialogOptions,
+	type WebContentsView,
 } from 'electron';
 
 export type Progress = {
@@ -110,6 +110,8 @@ export type Options = {
 	/**
 	Show a progress bar on the dock/taskbar icon when a download is in progress.
 
+	Downloads without an associated `BrowserWindow` are saved normally, but do not show a progress bar.
+
 	@default true
 	*/
 	readonly showProgressBar?: boolean;
@@ -178,7 +180,7 @@ ipcMain.on('download-button', async (event, {url}) => {
 ```
 */
 export function download(
-	window: BrowserWindow | BrowserView,
+	window: BrowserWindow | WebContentsView,
 	url: string,
 	options?: Options
 ): Promise<DownloadItem>;

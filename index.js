@@ -41,10 +41,8 @@ function registerListener(session, options, callback = () => {}) {
 		downloadItems.add(item);
 		totalBytes += item.getTotalBytes();
 
-		const window_ = BrowserWindow.fromWebContents(webContents);
-		if (!window_) {
-			throw new Error('Failed to get window from web contents.');
-		}
+		// `webContents` is null for `session.downloadURL()`, and there is no window for a detached `WebContentsView`.
+		const window_ = webContents ? BrowserWindow.fromWebContents(webContents) : undefined;
 
 		if (options.directory && !path.isAbsolute(options.directory)) {
 			throw new Error('The `directory` option must be an absolute path');
@@ -80,7 +78,7 @@ function registerListener(session, options, callback = () => {}) {
 				app.badgeCount = activeDownloadItems();
 			}
 
-			if (!window_.isDestroyed() && options.showProgressBar) {
+			if (window_ && !window_.isDestroyed() && options.showProgressBar) {
 				window_.setProgressBar(progressDownloadItems());
 			}
 
@@ -112,8 +110,11 @@ function registerListener(session, options, callback = () => {}) {
 				app.badgeCount = activeDownloadItems();
 			}
 
-			if (!window_.isDestroyed() && !activeDownloadItems()) {
-				window_.setProgressBar(-1);
+			if (!activeDownloadItems()) {
+				if (window_ && !window_.isDestroyed()) {
+					window_.setProgressBar(-1);
+				}
+
 				receivedBytes = 0;
 				completedBytes = 0;
 				totalBytes = 0;

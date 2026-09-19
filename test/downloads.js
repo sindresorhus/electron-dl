@@ -1,0 +1,20 @@
+import {execFile} from 'node:child_process';
+import {promisify} from 'node:util';
+import {fileURLToPath} from 'node:url';
+import process from 'node:process';
+import electron from 'electron';
+import test from 'ava';
+
+// Each case runs in its own Electron process. The fixture exits with a non-zero code when an assertion fails.
+const run = promisify(execFile);
+const fixture = fileURLToPath(new URL('fixtures/downloads.js', import.meta.url));
+
+for (const source of ['session', 'view', 'window']) {
+	test(`download from a ${source}`, async t => {
+		// Electron-based hosts (for example, VS Code) set `ELECTRON_RUN_AS_NODE`, which would make Electron run the fixture as plain Node.js.
+		const env = {...process.env};
+		delete env.ELECTRON_RUN_AS_NODE;
+		await run(electron, [fixture, source], {env, timeout: 30_000});
+		t.pass();
+	});
+}
