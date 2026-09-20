@@ -196,6 +196,11 @@ export default function electronDl(options = {}) {
 				return;
 			}
 
+			if (typeof options.onError === 'function') {
+				options.onError(error);
+				return;
+			}
+
 			const errorTitle = options.errorTitle ?? 'Download Error';
 			dialog.showErrorBox(errorTitle, error.message);
 		});

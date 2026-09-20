@@ -97,6 +97,26 @@ export type Options = {
 	readonly onCompleted?: (file: File) => void;
 
 	/**
+	Optional callback that receives the `Error` for a download that was interrupted and could not be resumed.
+
+	When this is provided, the error dialog is not shown.
+
+	This option only makes sense for the default export. `electronDl.download()` rejects with the error instead.
+
+	@example
+	```
+	import electronDl from 'electron-dl';
+
+	electronDl({
+		onError(error) {
+			console.error(error.message);
+		}
+	});
+	```
+	*/
+	readonly onError?: (error: Error) => void;
+
+	/**
 	Reveal the downloaded file in the system file manager, and if possible, select the file.
 
 	@default false

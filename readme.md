@@ -212,6 +212,26 @@ Optional callback that receives an object with information about an item that ha
 }
 ```
 
+#### onError
+
+Type: `Function`
+
+Optional callback that receives the `Error` for a download that was interrupted and could not be resumed.
+
+When this is provided, the error dialog is not shown. Use this to show your own error dialog or to handle the failure in another way.
+
+This option only makes sense for the default export. `electronDl.download()` rejects with the error instead.
+
+```js
+import electronDl from 'electron-dl';
+
+electronDl({
+	onError(error) {
+		console.error(error.message);
+	}
+});
+```
+
 #### openFolderWhenDone
 
 Type: `boolean`\
