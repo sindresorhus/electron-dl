@@ -6,6 +6,7 @@ import http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
+import {gzipSync} from 'node:zlib';
 import {
 	app,
 	BrowserWindow,
@@ -14,7 +15,7 @@ import {
 	session,
 } from 'electron';
 import {unsafeFilenameFixtures} from 'is-safe-filename';
-import electronDl, {download, CancelError} from '../../index.js';
+import electronDl, {download, downloadAsBytes, CancelError} from '../../index.js';
 
 // Which download source to test: `session` (`session.downloadURL()`, no `webContents`), `view` (detached `WebContentsView`, no window), or `window` (`BrowserWindow`).
 const source = process.argv[2];
@@ -176,6 +177,55 @@ async function testOwner(url, directory) {
 	}
 }
 
+async function testBytes(url) {
+	// A separate partition, since creating the `downloads` one here would suppress the `session-created` event `testSession` relies on.
+	const downloadSession = session.fromPartition('bytes');
+	const owner = new BrowserWindow({show: false, webPreferences: {session: downloadSession}});
+	const expected = size => Uint8Array.from(Buffer.alloc(size, 'x'));
+
+	try {
+		const progress = [];
+		const bytes = await downloadAsBytes(owner, url(4096), {
+			onProgress(value) {
+				progress.push(value);
+			},
+		});
+		assert.deepEqual(bytes, expected(4096));
+		assert.deepEqual(progress.at(-1), {percent: 1, transferredBytes: 4096, totalBytes: 4096});
+
+		// A download of unknown size must not report `NaN`.
+		const chunked = [];
+		const chunkedBytes = await downloadAsBytes(owner, url(4096, '?chunked'), {
+			onProgress(value) {
+				chunked.push(value);
+			},
+		});
+		assert.deepEqual(chunkedBytes, expected(4096));
+		assert.deepEqual(chunked.at(-1), {percent: 0, transferredBytes: 4096, totalBytes: 0});
+
+		// The `Content-Length` of a compressed response is the compressed size, so the total size must be treated as unknown.
+		const gzipped = [];
+		const gzippedBytes = await downloadAsBytes(owner, url(4096, '?gzip'), {
+			onProgress(value) {
+				gzipped.push(value);
+			},
+		});
+		assert.deepEqual(gzippedBytes, expected(4096));
+		assert.deepEqual(gzipped.at(-1), {percent: 0, transferredBytes: 4096, totalBytes: 0});
+
+		// An error response must reject instead of resolving with the error page.
+		await assert.rejects(downloadAsBytes(owner, url(4096, '?status=404')), {message: /404/v});
+
+		// The `signal` option must cancel the download.
+		const controller = new AbortController();
+		const aborted = downloadAsBytes(owner, url(4096), {signal: controller.signal});
+		controller.abort();
+		await assert.rejects(aborted, {name: 'AbortError'});
+	} finally {
+		owner.destroy();
+	}
+}
+
 async function testConcurrent(url, directory) {
 	const downloadSession = session.fromPartition('downloads');
 	const owner = new BrowserWindow({show: false, webPreferences: {session: downloadSession}});
@@ -242,6 +292,12 @@ async function run() {
 		const [size, search] = request.url.slice(1).split('?', 2);
 		const parameters = new URLSearchParams(search);
 
+		if (parameters.has('status')) {
+			response.writeHead(Number(parameters.get('status')));
+			response.end('error');
+			return;
+		}
+
 		if (parameters.has('redirect')) {
 			response.writeHead(302, {Location: `/${size}`});
 			response.end();
@@ -249,6 +305,17 @@ async function run() {
 		}
 
 		const data = Buffer.alloc(Number(size), 'x');
+
+		if (parameters.has('gzip')) {
+			const compressed = gzipSync(data);
+			response.writeHead(200, {
+				'Content-Type': 'application/octet-stream',
+				'Content-Encoding': 'gzip',
+				'Content-Length': compressed.length,
+			});
+			response.end(compressed);
+			return;
+		}
 
 		// Drops every connection until Chromium has given up retrying, so the download can only finish after it is resumed.
 		if (parameters.has('dropping')) {
@@ -290,6 +357,8 @@ async function run() {
 	const url = (size, search = '') => `http://127.0.0.1:${server.address().port}/${size}${search}`;
 
 	try {
+		await testBytes(url);
+
 		if (source === 'session') {
 			await testSession(url, directory);
 		} else {

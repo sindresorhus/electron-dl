@@ -62,6 +62,21 @@ ipcMain.on('download-button', async (event, {url}) => {
 });
 ```
 
+### Download into memory
+
+This can be useful if you want to process a file without saving it to disk first.
+
+```js
+import {BrowserWindow, ipcMain} from 'electron';
+import {downloadAsBytes} from 'electron-dl';
+
+ipcMain.on('download-button', async (event, {url}) => {
+	const win = BrowserWindow.getFocusedWindow();
+	const bytes = await downloadAsBytes(win, url);
+	console.log(bytes.length);
+});
+```
+
 ## API
 
 It can only be used in the [main](https://electronjs.org/docs/glossary/#main-process) process.
@@ -237,6 +252,38 @@ Default: `{}`
 Customize the save dialog.
 
 If `defaultPath` is not explicity defined, a default value is assigned based on the file path.
+
+### downloadAsBytes(window, url, options?): Promise<`Uint8Array`>
+
+Download a file into memory instead of saving it to disk. Use this when you want to process the file directly.
+
+The download does not appear in the Downloads directory. It is not shown in the dock/taskbar badge or progress bar, and it cannot be resumed.
+
+The promise rejects when the server responds with an error status.
+
+`window` and `url` are the same as for `download()`.
+
+#### onProgress
+
+Type: `Function`
+
+Optional callback that receives an object containing information about the progress of the download.
+
+```js
+{
+	percent: 0.1,
+	transferredBytes: 100,
+	totalBytes: 1000
+}
+```
+
+`percent` is `0` when the total size is not known, for example for a compressed or chunked response.
+
+#### signal
+
+Type: [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal)
+
+An `AbortSignal` to cancel the download with. An aborted download rejects with the signal's abort reason, which defaults to an `AbortError`.
 
 ## Development
 

@@ -225,3 +225,41 @@ export async function download(window_, url, options) {
 		session.downloadURL(normalizedUrl);
 	});
 }
+
+export async function downloadAsBytes(window_, url, options = {}) {
+	const {session} = window_.webContents;
+	const response = await session.fetch(url, {signal: options.signal});
+
+	if (!response.ok) {
+		throw new Error(`The download of ${url} failed with status ${response.status}`);
+	}
+
+	// Chromium decompresses the body, so for an encoded response `Content-Length` is the compressed size and cannot be used for progress.
+	const isEncoded = response.headers.get('content-encoding') !== null;
+	const totalBytes = isEncoded ? 0 : Number(response.headers.get('content-length')) || 0;
+	const chunks = [];
+	let transferredBytes = 0;
+
+	// `response.body` is null for responses that cannot have a body, for example `204`.
+	for await (const chunk of response.body ?? []) {
+		chunks.push(chunk);
+		transferredBytes += chunk.length;
+
+		if (typeof options.onProgress === 'function') {
+			options.onProgress({
+				percent: totalBytes === 0 ? 0 : transferredBytes / totalBytes,
+				transferredBytes,
+				totalBytes,
+			});
+		}
+	}
+
+	const bytes = new Uint8Array(transferredBytes);
+	let offset = 0;
+	for (const chunk of chunks) {
+		bytes.set(chunk, offset);
+		offset += chunk.length;
+	}
+
+	return bytes;
+}

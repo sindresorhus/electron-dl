@@ -138,6 +138,20 @@ export type Options = {
 	readonly dialogOptions?: SaveDialogOptions;
 };
 
+export type BytesOptions = {
+	/**
+	Optional callback that receives an object containing information about the progress of the download.
+
+	`percent` is `0` when the total size is not known, for example for a compressed or chunked response.
+	*/
+	readonly onProgress?: (progress: Progress) => void;
+
+	/**
+	An [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to cancel the download with. An aborted download rejects with the signal's abort reason, which defaults to an `AbortError`.
+	*/
+	readonly signal?: AbortSignal;
+};
+
 /**
 Error thrown if `item.cancel()` was called.
 */
@@ -189,3 +203,33 @@ export function download(
 	url: string,
 	options?: Options,
 ): Promise<DownloadItem>;
+
+/**
+Download a file into memory instead of saving it to disk. Use this when you want to process the file directly.
+
+The download does not appear in the Downloads directory. It is not shown in the dock/taskbar badge or progress bar, and it cannot be resumed.
+
+The promise rejects when the server responds with an error status.
+
+@param window - Window to download with.
+@param url - URL to download.
+@returns A promise for the contents of the downloaded file.
+@throws {Error} An error if the download fails.
+
+@example
+```
+import {BrowserWindow, ipcMain} from 'electron';
+import {downloadAsBytes} from 'electron-dl';
+
+ipcMain.on('download-button', async (event, {url}) => {
+	const win = BrowserWindow.getFocusedWindow();
+	const bytes = await downloadAsBytes(win, url);
+	console.log(bytes.length);
+});
+```
+*/
+export function downloadAsBytes(
+	window: BrowserWindow | WebContentsView,
+	url: string,
+	options?: BytesOptions,
+): Promise<Uint8Array>;
